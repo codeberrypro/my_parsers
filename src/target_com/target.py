@@ -195,4 +195,3 @@ if __name__ == "__main__":
     else:
         get_target_url()
 
-
