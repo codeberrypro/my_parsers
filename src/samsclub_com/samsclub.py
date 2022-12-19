@@ -65,7 +65,6 @@ def write_to_file(data):
 
 
 def write_to_errors_file(url):
-    print(f'посмотрите errors.txt')
     with open('errors.txt', 'a') as e_file:
         e_file.write(f'\n{url}')
 
@@ -147,7 +146,7 @@ def start(driver):
                 write_to_file(data)
                 success += 1
             except Exception as ex:
-                print(f'Ошибка при парсинге объекта ({ex})')
+                print(f'Error while parsing an object ({ex})')
                 write_to_errors_file(lines[line])
                 errors += 1
 
