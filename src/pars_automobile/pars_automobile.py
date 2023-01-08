@@ -50,7 +50,7 @@ def parsing(filter_brand, filter_year, filter_fuel):
         print("Fuel type filter not selected or selected wrong value")
 
     driver.execute_script("fnSearch(1)")
-    js_functions = getLinks(driver)
+    js_functions = get_links(driver)
 
     links = makeUrl(js_functions)
     getContent(driver, links, translator)
@@ -71,33 +71,33 @@ def auth(driver):
     time.sleep(1)
 
 
-def getLinks(driver):
-    tableTop = driver.find_element_by_class_name("tbl-top").find_element_by_tag_name("em").text
-    print(tableTop, 'vehicles on pages')
-    numberOfPages = ceil(int(tableTop) / 20)
-    pageList = []
-    if int(tableTop) > 30:
-        for page in range(numberOfPages):
+def get_links(driver):
+    table_top = driver.find_element_by_class_name("tbl-top").find_element_by_tag_name("em").text
+    print(table_top, 'vehicles on pages')
+    number_pages = ceil(int(table_top) / 20)
+    page_list = []
+    if int(table_top) > 30:
+        for page in range(number_pages):
             time.sleep(3)
             table = driver.find_element_by_class_name("tbl-t02").find_element_by_tag_name(
                 "tbody").find_elements_by_tag_name("tr")
             for tr in table:
-                trLink = tr.find_element_by_class_name("a_list").get_attribute("onclick")
-                pageList.append(trLink)
-            print("\tPage", page + 1, "of", numberOfPages, "pages.")
+                tr_link = tr.find_element_by_class_name("a_list").get_attribute("onclick")
+                page_list.append(tr_link)
+            print("\tPage", page + 1, "of", number_pages, "pages.")
             # Get next page
-            if (page + 1) != numberOfPages:
+            if (page + 1) != number_pages:
                 driver.execute_script(f"fnSearch({page + 2});return false; ")
     else:
         time.sleep(3)
         table = driver.find_element_by_class_name("tbl-t02").find_element_by_tag_name(
             "tbody").find_elements_by_tag_name("tr")
         for tr in table:
-            trLink = tr.find_element_by_class_name("a_list").get_attribute("onclick")
-            pageList.append(trLink)
+            tr_link = tr.find_element_by_class_name("a_list").get_attribute("onclick")
+            page_list.append(tr_link)
         print("\tPage", 1)
 
-    return pageList
+    return page_list
 
 
 def getContent(driver, links, translator):
