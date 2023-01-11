@@ -52,8 +52,8 @@ def parsing(filter_brand, filter_year, filter_fuel):
     driver.execute_script("fnSearch(1)")
     js_functions = get_links(driver)
 
-    links = makeUrl(js_functions)
-    getContent(driver, links, translator)
+    links = make_url(js_functions)
+    get_content(driver, links, translator)
     time.sleep(5)
     driver.quit()
     print("Parsing ended")
@@ -100,1544 +100,1544 @@ def get_links(driver):
     return page_list
 
 
-def getContent(driver, links, translator):
+def get_content(driver, links, translator):
     connect = mysqlConnecting()
     for link in links:
         driver.get(link)
 
         time.sleep(3)
-        mainContainer = driver.find_element_by_class_name("page-popup")
-        vin = mainContainer.find_element_by_class_name("vehicle-detail"). \
+        main_container = driver.find_element_by_class_name("page-popup")
+        vin = main_container.find_element_by_class_name("vehicle-detail"). \
             find_elements_by_class_name("tbl-v02")[0].find_element_by_xpath(".//tbody/tr[7]/td").text
-        checkAvailabel = f"SELECT `url` FROM `ns_goods` WHERE `code`='{vin}'"
-        response = readQuery(connect, checkAvailabel)
+        check_available = f"SELECT `url` FROM `ns_goods` WHERE `code`='{vin}'"
+        response = readQuery(connect, check_available)
         if len(response) != 0:
             print(f'Row already exist by URL {response[0][0]}')
         else:
-            nameDB = mainContainer.find_element_by_class_name("vehicle-tit").find_element_by_class_name("tit").text
-            entryNum = mainContainer.find_element_by_class_name("vehicle-tit").find_element_by_tag_name("strong").text
-            price = mainContainer.find_element_by_class_name("clfix").find_element_by_class_name("vehicle-info"). \
+            name_db = main_container.find_element_by_class_name("vehicle-tit").find_element_by_class_name("tit").text
+            entry_num = main_container.find_element_by_class_name("vehicle-tit").find_element_by_tag_name("strong").text
+            price = main_container.find_element_by_class_name("clfix").find_element_by_class_name("vehicle-info"). \
                 find_element_by_class_name("starting-price").find_element_by_tag_name("em").text
-            infoLi = mainContainer.find_element_by_class_name("clfix").find_element_by_class_name("vehicle-info"). \
+            info_li = main_container.find_element_by_class_name("clfix").find_element_by_class_name("vehicle-info"). \
                 find_element_by_tag_name("ul").find_elements_by_tag_name("li")
-            entryDate = infoLi[0].find_element_by_tag_name("strong").text
-            carNumber = infoLi[1].find_element_by_tag_name("strong").text
-            progress = infoLi[2].find_element_by_tag_name("strong").text
-            points = infoLi[3].find_element_by_tag_name("strong").text
+            entry_date = info_li[0].find_element_by_tag_name("strong").text
+            car_number = info_li[1].find_element_by_tag_name("strong").text
+            progress = info_li[2].find_element_by_tag_name("strong").text
+            points = info_li[3].find_element_by_tag_name("strong").text
 
-            detailTable = mainContainer.find_element_by_class_name("vehicle-detail"). \
+            detail_table = main_container.find_element_by_class_name("vehicle-detail"). \
                 find_elements_by_class_name("tbl-v02")[1].find_element_by_tag_name("tbody")
-            yearManDB = detailTable.find_element_by_xpath(".//tr[1]/td[1]").text
-            mileageDB = detailTable.find_element_by_xpath(".//tr[1]/td[2]").text
-            transmissionDB = detailTable.find_element_by_xpath(".//tr[2]/td[2]").text
-            engineTypeDB = detailTable.find_element_by_xpath(".//tr[4]/td[2]").text
-            engineCapacityDB = detailTable.find_element_by_xpath(".//tr[5]/td[2]").text
-            carType = detailTable.find_element_by_xpath(".//tr[6]/td[1]").text
-            regYear = detailTable.find_element_by_xpath(".//tr[2]/td[1]").text
+            year_man_db = detail_table.find_element_by_xpath(".//tr[1]/td[1]").text
+            mileage_db = detail_table.find_element_by_xpath(".//tr[1]/td[2]").text
+            transmission_db = detail_table.find_element_by_xpath(".//tr[2]/td[2]").text
+            engine_type_db = detail_table.find_element_by_xpath(".//tr[4]/td[2]").text
+            engine_capacity_db = detail_table.find_element_by_xpath(".//tr[5]/td[2]").text
+            car_type = detail_table.find_element_by_xpath(".//tr[6]/td[1]").text
+            reg_year = detail_table.find_element_by_xpath(".//tr[2]/td[1]").text
 
             # Images
             images = []
-            imageElements = mainContainer.find_element_by_class_name("vehicle-detail-view").find_element_by_xpath(
+            image_elements = main_container.find_element_by_class_name("vehicle-detail-view").find_element_by_xpath(
                 ".//div[contains(@class, 'vehicle-photo-detail swiper-container swiper-container-horizontal')]"). \
                 find_element_by_tag_name("ul").find_elements_by_tag_name("li")
-            for element in imageElements:
+            for element in image_elements:
                 element = element.find_element_by_tag_name("img")
                 images.append(element.get_attribute("src"))
             images.pop(0)
             images = images[:-1]
-            defectImage = []
-            if len(mainContainer.find_elements_by_class_name("car-status-map")) != 0:
-                defImage = mainContainer.find_element_by_class_name("car-status-map").find_element_by_tag_name("img"). \
+            defect_image = []
+            if len(main_container.find_elements_by_class_name("car-status-map")) != 0:
+                def_image = main_container.find_element_by_class_name("car-status-map").find_element_by_tag_name("img"). \
                     get_attribute("src")
-                defectImage.append(defImage)
+                defect_image.append(def_image)
 
             # Video
-            videoUrl = ''
-            video = mainContainer.find_element_by_id("yesMovie").find_elements_by_id("video")
+            video_url = ''
+            video = main_container.find_element_by_id("yesMovie").find_elements_by_id("video")
             if len(video) != 0:
-                videoUrl = video[0].find_element_by_tag_name("source").get_attribute("src")
+                video_url = video[0].find_element_by_tag_name("source").get_attribute("src")
 
-            videoUrl = str.replace(videoUrl, ".MP4?rel=0", ".MP4?rel=1")
+            video_url = str.replace(video_url, ".MP4?rel=0", ".MP4?rel=1")
 
             # Translation
-            nameDB = translator.translate(nameDB)
-            carNumber = translator.translate(carNumber)
+            name_db = translator.translate(name_db)
+            car_number = translator.translate(car_number)
             progress = translator.translate(progress)
-            transmissionDB = translator.translate(transmissionDB)
-            engineTypeDB = translator.translate(engineTypeDB)
-            carType = translator.translate(carType)
+            transmission_db = translator.translate(transmission_db)
+            engine_type_db = translator.translate(engine_type_db)
+            car_type = translator.translate(car_type)
 
             # Formatting
-            URL = vin + "-" + nameDB
-            URL = str.replace(URL, '+', '-')
-            URL = str.replace(URL, '.', '-')
-            URL = str.replace(URL, ' ', '-')
-            URL = str.replace(URL, '-(D)', '')
-            URL = str.replace(URL, '-(G)', '')
-            URL = str.replace(URL, '-(L)', '')
-            URL = str.replace(URL, '-(E)', '')
-            URL = str.replace(URL, '/', '')
-            URL = str.replace(URL, 'Ⅱ', '')
-            URL = URL.lower()
-            nameDB = str.replace(nameDB, 'All NEW ', '')
-            nameDB = str.replace(nameDB, 'All New ', '')
-            nameDB = str.replace(nameDB, 'ALL NEW', '')
-            nameDB = str.replace(nameDB, 'ALL New', '')
-            nameDB = str.replace(nameDB, 'THE NEW', '')
-            nameDB = str.replace(nameDB, 'The New', '')
-            nameDB = str.replace(nameDB, 'New ', '')
-            nameDB = str.replace(nameDB, 'All ', '')
-            nameDB = str.replace(nameDB, 'Ⅱ', '')
+            url = vin + "-" + name_db
+            url = str.replace(url, '+', '-')
+            url = str.replace(url, '.', '-')
+            url = str.replace(url, ' ', '-')
+            url = str.replace(url, '-(D)', '')
+            url = str.replace(url, '-(G)', '')
+            url = str.replace(url, '-(L)', '')
+            url = str.replace(url, '-(E)', '')
+            url = str.replace(url, '/', '')
+            url = str.replace(url, 'Ⅱ', '')
+            url = url.lower()
+            name_db = str.replace(name_db, 'All NEW ', '')
+            name_db = str.replace(name_db, 'All New ', '')
+            name_db = str.replace(name_db, 'ALL NEW', '')
+            name_db = str.replace(name_db, 'ALL New', '')
+            name_db = str.replace(name_db, 'THE NEW', '')
+            name_db = str.replace(name_db, 'The New', '')
+            name_db = str.replace(name_db, 'New ', '')
+            name_db = str.replace(name_db, 'All ', '')
+            name_db = str.replace(name_db, 'Ⅱ', '')
             points = str.replace(points, " ", "")
             price = float(str.replace(price, " ", "").strip())
             convertation = CurrencyConverter()
             price = float(ceil(convertation.convert(price * 10000, 'KRW', 'USD')))
 
-            engineCapacityDB = (str.replace(engineCapacityDB, " cc", "")).strip()
-            engineCapacityDB = str.replace(engineCapacityDB, " ", ".")
-            engineCapacityDB = round(float(engineCapacityDB), 1)
-            if engineCapacityDB == 998.0:
-                engineCapacityDB = 1.0
+            engine_capacity_db = (str.replace(engine_capacity_db, " cc", "")).strip()
+            engine_capacity_db = str.replace(engine_capacity_db, " ", ".")
+            engine_capacity_db = round(float(engine_capacity_db), 1)
+            if engine_capacity_db == 998.0:
+                engine_capacity_db = 1.0
 
-            mileageDB = (str.replace(mileageDB, " Km", "")).strip()
-            mileageDB = int(str.replace(mileageDB, " ", ""))
+            mileage_db = (str.replace(mileage_db, " Km", "")).strip()
+            mileage_db = int(str.replace(mileage_db, " ", ""))
 
             chars = ''
-            if engineTypeDB.lower() == "diesel":
-                engineTypeDB = "Дизель"
+            if engine_type_db.lower() == "diesel":
+                engine_type_db = "Дизель"
                 chars += "|77|"
-            elif engineTypeDB.lower() == "lpg":
-                engineTypeDB = 'Газ'
+            elif engine_type_db.lower() == "lpg":
+                engine_type_db = 'Газ'
                 chars += '|82|'
-            elif engineTypeDB.lower() == "gasoline":
-                engineTypeDB = 'Бензин'
+            elif engine_type_db.lower() == "gasoline":
+                engine_type_db = 'Бензин'
                 chars += '|79|'
-            elif engineTypeDB.lower() == "electric":
-                engineTypeDB = 'Электро'
+            elif engine_type_db.lower() == "electric":
+                engine_type_db = 'Электро'
                 chars += '|78|'
-            elif engineTypeDB.lower() == "hybrid":
-                engineTypeDB = 'Гибрид'
+            elif engine_type_db.lower() == "hybrid":
+                engine_type_db = 'Гибрид'
                 chars += '|80|'
 
-            if transmissionDB.lower() == 'automatic':
-                transmissionDB = 'Автомат'
+            if transmission_db.lower() == 'automatic':
+                transmission_db = 'Автомат'
                 chars += '|31|'
-            elif transmissionDB.lower() == 'manual':
-                transmissionDB = 'Механика'
+            elif transmission_db.lower() == 'manual':
+                transmission_db = 'Механика'
                 chars += '|32|'
 
-            if 'sedan' in carType.lower():  # carType = 'Седан'
-                carType = "Sedan"
+            if 'sedan' in car_type.lower():  # carType = 'Седан'
+                car_type = "Sedan"
                 chars += '|69|'
-            elif 'suv' in carType.lower():  # carType = 'Кроссовер'
-                carType = "SUV"
+            elif 'suv' in car_type.lower():  # carType = 'Кроссовер'
+                car_type = "SUV"
                 chars += '|66|'
-            elif 'van' in carType.lower():  # carType = 'Минивэн'
-                carType = "Van/MiniVan"
+            elif 'van' in car_type.lower():  # carType = 'Минивэн'
+                car_type = "Van/MiniVan"
                 chars += '|68|'
 
-            driveTypeDB = 'Не указан'
-            if "2wd" in nameDB.lower():
-                driveTypeDB = 'Передний'
+            drive_type_db = 'Не указан'
+            if "2wd" in name_db.lower():
+                drive_type_db = 'Передний'
                 chars += '|72|'
-            elif "4wd" in nameDB.lower():
-                driveTypeDB = 'Полный'
+            elif "4wd" in name_db.lower():
+                drive_type_db = 'Полный'
                 chars += '|73|'
-            elif "awd" in nameDB.lower():
-                driveTypeDB = 'Полный'
+            elif "awd" in name_db.lower():
+                drive_type_db = 'Полный'
                 chars += '|73|'
 
-            markaDB = ""
-            modelDB = ""
+            marka_db = ""
+            model_db = ""
             # filterParamId
-            if 'morning' in nameDB.lower():  # Kia
-                markaDB = "Kia"
-                modelDB = "Morning"
+            if 'morning' in name_db.lower():  # Kia
+                marka_db = "Kia"
+                model_db = "Morning"
                 chars += '|113|'
-            if 'opirus' in nameDB.lower() or 'lovers' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Opirus"
+            if 'opirus' in name_db.lower() or 'lovers' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Opirus"
                 chars += '|173|'
-            if 'carnival' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Carnival"
+            if 'carnival' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Carnival"
                 chars += '|120|'
-            if 'forte' in nameDB.lower() or 'strong couple' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Forte"
+            if 'forte' in name_db.lower() or 'strong couple' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Forte"
                 chars += '|174|'
-            if 'k3' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "K3"
+            if 'k3' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "K3"
                 chars += '|118|'
-            if 'k5' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "K5"
+            if 'k5' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "K5"
                 chars += '|441|'
-            if 'k7' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "K7"
+            if 'k7' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "K7"
                 chars += '|103|'
-            if 'k9' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "K9"
+            if 'k9' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "K9"
                 chars += '|119|'
-            if 'sorento' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Sorento"
+            if 'sorento' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Sorento"
                 chars += '|135|'
-            if 'mojave' in nameDB.lower() or 'mohave' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Mojave"
+            if 'mojave' in name_db.lower() or 'mohave' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Mojave"
                 chars += '|175|'
-            if 'bongo' in nameDB.lower() or 'rhino' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Bongo"
+            if 'bongo' in name_db.lower() or 'rhino' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Bongo"
                 chars += '|176|'
-            if 'sportage' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Sportage"
+            if 'sportage' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Sportage"
                 chars += '|111|'
-            if 'soul' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Soul"
+            if 'soul' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Soul"
                 chars += '|136|'
-            if 'carens' in nameDB.lower() or 'carena' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Carens"
+            if 'carens' in name_db.lower() or 'carena' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Carens"
                 chars += '|177|'
-            if 'roche' in nameDB.lower() or 'lotze' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Roche"
+            if 'roche' in name_db.lower() or 'lotze' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Roche"
                 chars += '|178|'
-            if 'serato' in nameDB.lower() or 'cerato' in nameDB.lower() or 'waxed' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Serato"
+            if 'serato' in name_db.lower() or 'cerato' in name_db.lower() or 'waxed' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Serato"
                 chars += '|179|'
-            if 'optima' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Optima"
+            if 'optima' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Optima"
                 chars += '|180|'
-            if 'casta' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Casta"
+            if 'casta' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Casta"
                 chars += '|181|'
-            if 'combi' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Combi"
+            if 'combi' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Combi"
                 chars += '|182|'
-            if 'tauner' in nameDB.lower() or 'towner' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Tauner"
+            if 'tauner' in name_db.lower() or 'towner' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Tauner"
                 chars += '|183|'
-            if 'hunger pride' in nameDB.lower() or 'pride' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Hunger Pride"
+            if 'hunger pride' in name_db.lower() or 'pride' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Hunger Pride"
                 chars += '|184|'
-            if 'ray' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Ray"
+            if 'ray' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Ray"
                 chars += '|132|'
-            if 'grandbird' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Grandbird"
+            if 'grandbird' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Grandbird"
                 chars += '|185|'
-            if 'niro' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Niro"
+            if 'niro' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Niro"
                 chars += '|186|'
-            if 'stinger' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Stinger"
+            if 'stinger' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Stinger"
                 chars += '|121|'
-            if 'hunger stony' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Hunger Stony"
+            if 'hunger stony' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Hunger Stony"
                 chars += '|187|'
-            if 'seltos' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Seltos"
+            if 'seltos' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Seltos"
                 chars += '|134|'
-            if 'stonic' in nameDB.lower():
-                markaDB = "Kia"
-                modelDB = "Stonic"
+            if 'stonic' in name_db.lower():
+                marka_db = "Kia"
+                model_db = "Stonic"
                 chars += '|133|'
-            if 'sonata' in nameDB.lower():  # Hyundai
-                markaDB = "Hyundai"
-                modelDB = "Sonata"
+            if 'sonata' in name_db.lower():  # Hyundai
+                marka_db = "Hyundai"
+                model_db = "Sonata"
                 chars += '|112|'
-            if 'grandeur' in nameDB.lower() or 'size' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Grandeur"
+            if 'grandeur' in name_db.lower() or 'size' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Grandeur"
                 chars += '|105|'
-            if 'verna' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Verna"
+            if 'verna' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Verna"
                 chars += '|188|'
-            if 'eye certi' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Eye Certi"
+            if 'eye certi' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Eye Certi"
                 chars += '|189|'
-            if 'click' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Click"
+            if 'click' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Click"
                 chars += '|190|'
-            if 'avante' in nameDB.lower() or 'advantageous' in nameDB.lower() or 'forward' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Avante"
+            if 'avante' in name_db.lower() or 'advantageous' in name_db.lower() or 'forward' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Avante"
                 chars += '|106|'
-            if 'equus' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Equus"
+            if 'equus' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Equus"
                 chars += '|191|'
-            if 'starex' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Starex"
+            if 'starex' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Starex"
                 chars += '|192|'
-            if 'veracruz' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Veracruz"
+            if 'veracruz' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Veracruz"
                 chars += '|193|'
-            if 'santa fe' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "SantaFe"
+            if 'santa fe' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "SantaFe"
                 chars += '|95|'
-            if 'santafe' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "SantaFe"
+            if 'santafe' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "SantaFe"
                 chars += '|95|'
-            if 'tucson' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Tucson"
+            if 'tucson' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Tucson"
                 chars += '|109|'
-            if 'porter' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Porter"
+            if 'porter' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Porter"
                 chars += '|194|'
-            if 'country' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Country"
+            if 'country' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Country"
                 chars += '|195|'
-            if 'grace' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Grace"
+            if 'grace' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Grace"
                 chars += '196'
-            if 'dynasty' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Dynasty"
+            if 'dynasty' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Dynasty"
                 chars += '|197|'
-            if 'lavita' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Lavita"
+            if 'lavita' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Lavita"
                 chars += '|198|'
-            if 'libero' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Libero"
+            if 'libero' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Libero"
                 chars += '|199|'
-            if 'marsha' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Marsha"
+            if 'marsha' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Marsha"
                 chars += '|200|'
-            if 'mighty' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Mighty"
+            if 'mighty' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Mighty"
                 chars += '|201|'
-            if 'aerotown' in nameDB.lower() or 'aero town' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Aerotown"
+            if 'aerotown' in name_db.lower() or 'aero town' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Aerotown"
                 chars += '|202|'
-            if 'accent' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Accent"
+            if 'accent' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Accent"
                 chars += '|138|'
-            if 'chorus' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Modern Chorus"
+            if 'chorus' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Modern Chorus"
                 chars += '203'
-            if 'terracan' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Terracan"
+            if 'terracan' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Terracan"
                 chars += '|204|'
-            if 'tuscany' in nameDB.lower() or 'tuscani' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Tuscany"
+            if 'tuscany' in name_db.lower() or 'tuscani' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Tuscany"
                 chars += '|205|'
-            if 'trajet' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Trajet"
+            if 'trajet' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Trajet"
                 chars += '|206|'
-            if 'truck' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Truck"
+            if 'truck' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Truck"
                 chars += '|207|'
-            if 'universe' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Universe"
+            if 'universe' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Universe"
                 chars += '|208|'
-            if 'veloster' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Veloster"
+            if 'veloster' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Veloster"
                 chars += '|140|'
-            if 'ipodi' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "iPodi"
+            if 'ipodi' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "iPodi"
                 chars += '|209|'
-            if 'maxcruise' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Maxcruise"
+            if 'maxcruise' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Maxcruise"
                 chars += '|102|'
-            if 'max cruise' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Maxcruise"
+            if 'max cruise' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Maxcruise"
                 chars += '|102|'
-            if 'aslan' in nameDB.lower() or 'lion ' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Aslan"
+            if 'aslan' in name_db.lower() or 'lion ' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Aslan"
                 chars += '|210|'
-            if 'green city' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Green City"
+            if 'green city' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Green City"
                 chars += '|211|'
-            if 'unicity' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Unicity"
+            if 'unicity' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Unicity"
                 chars += '|212|'
-            if 'solati' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Solati"
+            if 'solati' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Solati"
                 chars += '|213|'
-            if 'ionic' in nameDB.lower() or 'ioniq' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Ionic"
+            if 'ionic' in name_db.lower() or 'ioniq' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Ionic"
                 chars += '|214|'
-            if 'kona' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Kona"
+            if 'kona' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Kona"
                 chars += '|137|'
-            if 'csm truck' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Soosan CSM truck"
+            if 'csm truck' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Soosan CSM truck"
                 chars += '|215|'
-            if 'nexo' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Nexo"
+            if 'nexo' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Nexo"
                 chars += '|216|'
-            if 'palisade' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Palisade"
+            if 'palisade' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Palisade"
                 chars += '|143|'
-            if 'sungjin potter' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Sungjin Potter"
+            if 'sungjin potter' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Sungjin Potter"
                 chars += '|217|'
-            if 'venue' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Venue"
+            if 'venue' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Venue"
                 chars += '|139|'
-            if 'dasan heavy industries mighty' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Dasan Heavy Industries Mighty"
+            if 'dasan heavy industries mighty' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Dasan Heavy Industries Mighty"
                 chars += '|218|'
-            if 'i30' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "i30"
+            if 'i30' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "i30"
                 chars += '|141|'
-            if 'maxcruz' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "Maxcruz"
+            if 'maxcruz' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "Maxcruz"
                 chars += '|142|'
-            if 'i40' in nameDB.lower():
-                markaDB = "Hyundai"
-                modelDB = "i40"
+            if 'i40' in name_db.lower():
+                marka_db = "Hyundai"
+                model_db = "i40"
                 chars += '|144|'
-            if 'rav4' in nameDB.lower():  # Toyota
-                markaDB = "Toyota"
-                modelDB = "Rav4"
+            if 'rav4' in name_db.lower():  # Toyota
+                marka_db = "Toyota"
+                model_db = "Rav4"
                 chars += '|219|'
-            if 'camry' in nameDB.lower():
-                markaDB = "Toyota"
-                modelDB = "Camry"
+            if 'camry' in name_db.lower():
+                marka_db = "Toyota"
+                model_db = "Camry"
                 chars += '|125|'
-            if 'prius' in nameDB.lower():
-                markaDB = "Toyota"
-                modelDB = "Prius"
+            if 'prius' in name_db.lower():
+                marka_db = "Toyota"
+                model_db = "Prius"
                 chars += '|220|'
-            if 'avalon' in nameDB.lower():
-                markaDB = "Toyota"
-                modelDB = "Avalon"
+            if 'avalon' in name_db.lower():
+                marka_db = "Toyota"
+                model_db = "Avalon"
                 chars += '|221|'
-            if 'vivi' in nameDB.lower():
-                markaDB = "Toyota"
-                modelDB = "Vivi"
+            if 'vivi' in name_db.lower():
+                marka_db = "Toyota"
+                model_db = "Vivi"
                 chars += '|222|'
-            if 'corolla' in nameDB.lower():
-                markaDB = "Toyota"
-                modelDB = "Corolla"
+            if 'corolla' in name_db.lower():
+                marka_db = "Toyota"
+                model_db = "Corolla"
                 chars += '|223|'
-            if 'sienna' in nameDB.lower():
-                markaDB = "Toyota"
-                modelDB = "Sienna"
+            if 'sienna' in name_db.lower():
+                marka_db = "Toyota"
+                model_db = "Sienna"
                 chars += '|126|'
-            if 'benza' in nameDB.lower():
-                markaDB = "Toyota"
-                modelDB = "Benza"
+            if 'benza' in name_db.lower():
+                marka_db = "Toyota"
+                model_db = "Benza"
                 chars += '|224|'
-            if 'fj cruiser' in nameDB.lower():
-                markaDB = "Toyota"
-                modelDB = "FJ Cruiser"
+            if 'fj cruiser' in name_db.lower():
+                marka_db = "Toyota"
+                model_db = "FJ Cruiser"
                 chars += '|225|'
-            if 'land cruiser 200' in nameDB.lower():
-                markaDB = "Toyota"
-                modelDB = "Land Cruiser 200"
+            if 'land cruiser 200' in name_db.lower():
+                marka_db = "Toyota"
+                model_db = "Land Cruiser 200"
                 chars += '|116|'
-            if 'es ' in nameDB.lower():  # Lexus
-                markaDB = "Lexus"
-                modelDB = "ES"
+            if 'es ' in name_db.lower():  # Lexus
+                marka_db = "Lexus"
+                model_db = "ES"
                 chars += '|226|'
-            if 'gs ' in nameDB.lower():
-                markaDB = "Lexus"
-                modelDB = "GS"
+            if 'gs ' in name_db.lower():
+                marka_db = "Lexus"
+                model_db = "GS"
                 chars += '|227|'
-            if 'ls ' in nameDB.lower():
-                markaDB = "Lexus"
-                modelDB = "LS"
+            if 'ls ' in name_db.lower():
+                marka_db = "Lexus"
+                model_db = "LS"
                 chars += '|228|'
-            if 'rx ' in nameDB.lower():
-                markaDB = "Lexus"
-                modelDB = "RX"
+            if 'rx ' in name_db.lower():
+                marka_db = "Lexus"
+                model_db = "RX"
                 chars += '|229|'
-            if 'sc ' in nameDB.lower():
-                markaDB = "Lexus"
-                modelDB = "SC"
+            if 'sc ' in name_db.lower():
+                marka_db = "Lexus"
+                model_db = "SC"
                 chars += '|230|'
-            if 'gs ' in nameDB.lower():
-                markaDB = "Lexus"
-                modelDB = "GS"
+            if 'gs ' in name_db.lower():
+                marka_db = "Lexus"
+                model_db = "GS"
                 chars += '|231|'
-            if 'ct ' in nameDB.lower():
-                markaDB = "Lexus"
-                modelDB = "CT"
+            if 'ct ' in name_db.lower():
+                marka_db = "Lexus"
+                model_db = "CT"
                 chars += '|232|'
-            if 'nx ' in nameDB.lower():
-                markaDB = "Lexus"
-                modelDB = "NX"
+            if 'nx ' in name_db.lower():
+                marka_db = "Lexus"
+                model_db = "NX"
                 chars += '|233|'
-            if 'rc ' in nameDB.lower():
-                markaDB = "Lexus"
-                modelDB = "RC"
+            if 'rc ' in name_db.lower():
+                marka_db = "Lexus"
+                model_db = "RC"
                 chars += '|234|'
-            if 'ux ' in nameDB.lower():
-                markaDB = "Lexus"
-                modelDB = "UX"
+            if 'ux ' in name_db.lower():
+                marka_db = "Lexus"
+                model_db = "UX"
                 chars += '|235|'
-            if 'eq900' in nameDB.lower():  # Genesis
-                markaDB = "Genesis"
-                modelDB = "EQ900"
+            if 'eq900' in name_db.lower():  # Genesis
+                marka_db = "Genesis"
+                model_db = "EQ900"
                 chars += '|94|'
-            if 'g80' in nameDB.lower():
-                markaDB = "Genesis"
-                modelDB = "G80"
+            if 'g80' in name_db.lower():
+                marka_db = "Genesis"
+                model_db = "G80"
                 chars += '|145|'
-            if 'g70' in nameDB.lower():
-                markaDB = "Genesis"
-                modelDB = "G70"
+            if 'g70' in name_db.lower():
+                marka_db = "Genesis"
+                model_db = "G70"
                 chars += '|236|'
-            if 'g90' in nameDB.lower():
-                markaDB = "Genesis"
-                modelDB = "G90"
+            if 'g90' in name_db.lower():
+                marka_db = "Genesis"
+                model_db = "G90"
                 chars += '|237|'
-            if 'gv80' in nameDB.lower():
-                markaDB = "Genesis"
-                modelDB = "GV80"
+            if 'gv80' in name_db.lower():
+                marka_db = "Genesis"
+                model_db = "GV80"
                 chars += '|238|'
-            if 'gv70' in nameDB.lower():
-                markaDB = "Genesis"
-                modelDB = "GV70"
+            if 'gv70' in name_db.lower():
+                marka_db = "Genesis"
+                model_db = "GV70"
                 chars += '|239|'
-            if 'winstorm' in nameDB.lower():  # GM
-                markaDB = "GM"
-                modelDB = "Winstorm"
+            if 'winstorm' in name_db.lower():  # GM
+                marka_db = "GM"
+                model_db = "Winstorm"
                 chars += '|240|'
-            if 'tosca' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Tosca"
+            if 'tosca' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Tosca"
                 chars += '|241|'
-            if 'alpheon' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Alpheon"
+            if 'alpheon' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Alpheon"
                 chars += '|242|'
-            if 'gentra' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Gentra"
+            if 'gentra' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Gentra"
                 chars += '|243|'
-            if 'lacetti' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Lacetti"
+            if 'lacetti' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Lacetti"
                 chars += '|244|'
-            if 'matiz' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Matiz"
+            if 'matiz' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Matiz"
                 chars += '|245|'
-            if 'damas' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Damas"
+            if 'damas' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Damas"
                 chars += '|246|'
-            if 'veritas' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Veritas"
+            if 'veritas' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Veritas"
                 chars += '|247|'
-            if 'lab ' in nameDB.lower() or 'labo ' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Lab"
+            if 'lab ' in name_db.lower() or 'labo ' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Lab"
                 chars += '|248|'
-            if 'statesman' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Statesman"
+            if 'statesman' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Statesman"
                 chars += '|249|'
-            if 'spark' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Spark"
+            if 'spark' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Spark"
                 chars += '|124|'
-            if 'aveo' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Aveo"
+            if 'aveo' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Aveo"
                 chars += '|250|'
-            if 'cruise ' in nameDB.lower() or 'cruze ' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Cruise"
+            if 'cruise ' in name_db.lower() or 'cruze ' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Cruise"
                 chars += '|251|'
-            if 'orlando' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Orlando"
+            if 'orlando' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Orlando"
                 chars += '|252|'
-            if 'captiva' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Captiva"
+            if 'captiva' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Captiva"
                 chars += '|253|'
-            if 'malibu' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Malibu"
+            if 'malibu' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Malibu"
                 chars += '|254|'
-            if 'corvette' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Corvette"
+            if 'corvette' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Corvette"
                 chars += '|255|'
-            if 'trax' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Trax"
+            if 'trax' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Trax"
                 chars += '|256|'
-            if 'camaro' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Camaro"
+            if 'camaro' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Camaro"
                 chars += '|257|'
-            if 'impala' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Impala"
+            if 'impala' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Impala"
                 chars += '|258|'
-            if 'volt' in nameDB.lower() or 'bolt' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Volt"
+            if 'volt' in name_db.lower() or 'bolt' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Volt"
                 chars += '|259|'
-            if 'equinox' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Equinox"
+            if 'equinox' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Equinox"
                 chars += '|260|'
-            if 'colorado' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Colorado"
+            if 'colorado' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Colorado"
                 chars += '|261|'
-            if 'traverse' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Traverse"
+            if 'traverse' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Traverse"
                 chars += '|262|'
-            if 'trail blazer' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Trail Blazer"
+            if 'trail blazer' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Trail Blazer"
                 chars += '|263|'
-            if 'gm express' in nameDB.lower():
-                markaDB = "GM"
-                modelDB = "Express"
+            if 'gm express' in name_db.lower():
+                marka_db = "GM"
+                model_db = "Express"
                 chars += '|264|'
-            if 'sm3 ' in nameDB.lower():  # Renault Samsung
-                markaDB = "Renault Samsung"
-                modelDB = "SM3"
+            if 'sm3 ' in name_db.lower():  # Renault Samsung
+                marka_db = "Renault Samsung"
+                model_db = "SM3"
                 chars += '|265|'
-            if 'sm5 ' in nameDB.lower() or 'sm 5' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "SM5"
+            if 'sm5 ' in name_db.lower() or 'sm 5' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "SM5"
                 chars += '|266|'
-            if 'sm7 ' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "SM7"
+            if 'sm7 ' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "SM7"
                 chars += '|267|'
-            if 'qm5 ' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "QM5"
+            if 'qm5 ' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "QM5"
                 chars += '|268|'
-            if 'yamujin' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "Yamujin"
+            if 'yamujin' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "Yamujin"
                 chars += '|269|'
-            if 'qm3 ' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "QM3"
+            if 'qm3 ' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "QM3"
                 chars += '|270|'
-            if 'sm6 ' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "SM6"
+            if 'sm6 ' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "SM6"
                 chars += '|271|'
-            if 'qm6 ' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "QM6"
+            if 'qm6 ' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "QM6"
                 chars += '|272|'
-            if 'tweed' in nameDB.lower() or 'twizy' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "Tweed"
+            if 'tweed' in name_db.lower() or 'twizy' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "Tweed"
                 chars += '|273|'
-            if 'clio' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "Clio"
+            if 'clio' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "Clio"
                 chars += '|274|'
-            if 'master ' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "Master"
+            if 'master ' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "Master"
                 chars += '|275|'
-            if 'captur ' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "Captur"
+            if 'captur ' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "Captur"
                 chars += '|276|'
-            if 'joe ' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "Joe"
+            if 'joe ' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "Joe"
                 chars += '|277|'
-            if 'coban' in nameDB.lower():
-                markaDB = "Renault Samsung"
-                modelDB = "Kwangil Indastry Coban Camper"
+            if 'coban' in name_db.lower():
+                marka_db = "Renault Samsung"
+                model_db = "Kwangil Indastry Coban Camper"
                 chars += '|278|'
-            if 'chairman' in nameDB.lower():  # Ssangyong
-                markaDB = "Ssangyong"
-                modelDB = "Chairman"
+            if 'chairman' in name_db.lower():  # Ssangyong
+                marka_db = "Ssangyong"
+                model_db = "Chairman"
                 chars += '|279|'
-            if 'rexton' in nameDB.lower():
-                markaDB = "Ssangyong"
-                modelDB = "Rexton"
+            if 'rexton' in name_db.lower():
+                marka_db = "Ssangyong"
+                model_db = "Rexton"
                 chars += '|280|'
-            if 'rodius' in nameDB.lower():
-                markaDB = "Ssangyong"
-                modelDB = "Rodius"
+            if 'rodius' in name_db.lower():
+                marka_db = "Ssangyong"
+                model_db = "Rodius"
                 chars += '|281|'
-            if 'actyon' in nameDB.lower():
-                markaDB = "Ssangyong"
-                modelDB = "Actyon"
+            if 'actyon' in name_db.lower():
+                marka_db = "Ssangyong"
+                model_db = "Actyon"
                 chars += '|282|'
-            if 'kyron' in nameDB.lower():
-                markaDB = "Ssangyong"
-                modelDB = "Kyron"
+            if 'kyron' in name_db.lower():
+                marka_db = "Ssangyong"
+                model_db = "Kyron"
                 chars += '|283|'
-            if 'musso' in nameDB.lower() or 'musser' in nameDB.lower():
-                markaDB = "Ssangyong"
-                modelDB = "Musso"
+            if 'musso' in name_db.lower() or 'musser' in name_db.lower():
+                marka_db = "Ssangyong"
+                model_db = "Musso"
                 chars += '|284|'
-            if 'istana' in nameDB.lower():
-                markaDB = "Ssangyong"
-                modelDB = "Istana"
+            if 'istana' in name_db.lower():
+                marka_db = "Ssangyong"
+                model_db = "Istana"
                 chars += '|285|'
-            if 'korando ' in nameDB.lower():
-                markaDB = "Ssangyong"
-                modelDB = "Korando"
+            if 'korando ' in name_db.lower():
+                marka_db = "Ssangyong"
+                model_db = "Korando"
                 chars += '|286|'
-            if 'tivoli' in nameDB.lower():
-                markaDB = "Ssangyong"
-                modelDB = "Tivoli"
+            if 'tivoli' in name_db.lower():
+                marka_db = "Ssangyong"
+                model_db = "Tivoli"
                 chars += '|287|'
-            if 'vintage ' in nameDB.lower():  # Aston Martin
-                markaDB = "Aston Martin"
-                modelDB = "Vintage"
+            if 'vintage ' in name_db.lower():  # Aston Martin
+                marka_db = "Aston Martin"
+                model_db = "Vintage"
                 chars += '|288|'
-            if 'vanish ' in nameDB.lower():
-                markaDB = "Aston Martin"
-                modelDB = "Vanish"
+            if 'vanish ' in name_db.lower():
+                marka_db = "Aston Martin"
+                model_db = "Vanish"
                 chars += '|289|'
-            if 'a4 ' in nameDB.lower():  # Audi
-                markaDB = "Audi"
-                modelDB = "A4"
+            if 'a4 ' in name_db.lower():  # Audi
+                marka_db = "Audi"
+                model_db = "A4"
                 chars += '|290|'
-            if 'a5 ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "A5"
+            if 'a5 ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "A5"
                 chars += '|291|'
-            if 'a6 ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "A6"
+            if 'a6 ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "A6"
                 chars += '|292|'
-            if 'a8 ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "A8"
+            if 'a8 ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "A8"
                 chars += '|293|'
-            if 'q5 ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "Q5"
+            if 'q5 ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "Q5"
                 chars += '|294|'
-            if 'q7 ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "Q7"
+            if 'q7 ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "Q7"
                 chars += '|295|'
-            if 'aude r' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "R"
+            if 'aude r' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "R"
                 chars += '|296|'
-            if 'audi s' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "S"
+            if 'audi s' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "S"
                 chars += '|297|'
-            if 'tt ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "TT"
+            if 'tt ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "TT"
                 chars += '|298|'
-            if 'audi rs' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "RS"
+            if 'audi rs' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "RS"
                 chars += '|299|'
-            if 'a7 ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "A7"
+            if 'a7 ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "A7"
                 chars += '|300|'
-            if 'q3 ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "Q3"
+            if 'q3 ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "Q3"
                 chars += '|301|'
-            if 'audi sq' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "SQ"
+            if 'audi sq' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "SQ"
                 chars += '|302|'
-            if 'audi a1 ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "A1"
+            if 'audi a1 ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "A1"
                 chars += '|303|'
-            if 'q8 ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "Q8"
+            if 'q8 ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "Q8"
                 chars += '|304|'
-            if 'e-tron ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "E-tron"
+            if 'e-tron ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "E-tron"
                 chars += '|305|'
-            if 'q2 ' in nameDB.lower():
-                markaDB = "Audi"
-                modelDB = "Q2"
+            if 'q2 ' in name_db.lower():
+                marka_db = "Audi"
+                model_db = "Q2"
                 chars += '|306|'
-            if 'flying spur' in nameDB.lower():  # Bentley
-                markaDB = "Bentley"
-                modelDB = "Flying Spur"
+            if 'flying spur' in name_db.lower():  # Bentley
+                marka_db = "Bentley"
+                model_db = "Flying Spur"
                 chars += '|307|'
-            if 'gt contonental' in nameDB.lower():
-                markaDB = "Bentley"
-                modelDB = "GT Contonental"
+            if 'gt contonental' in name_db.lower():
+                marka_db = "Bentley"
+                model_db = "GT Contonental"
                 chars += '|308|'
-            if 'gtc contonental' in nameDB.lower():
-                markaDB = "Bentley"
-                modelDB = "GTC Contonental"
+            if 'gtc contonental' in name_db.lower():
+                marka_db = "Bentley"
+                model_db = "GTC Contonental"
                 chars += '|309|'
-            if 'arnage' in nameDB.lower():
-                markaDB = "Bentley"
-                modelDB = "Arnage"
+            if 'arnage' in name_db.lower():
+                marka_db = "Bentley"
+                model_db = "Arnage"
                 chars += '|310|'
-            if 'mulsanne' in nameDB.lower():
-                markaDB = "Bentley"
-                modelDB = "Mulsanne"
+            if 'mulsanne' in name_db.lower():
+                marka_db = "Bentley"
+                model_db = "Mulsanne"
                 chars += '|311|'
-            if 'bmw 1' in nameDB.lower():  # BMW
-                markaDB = "BMW"
-                modelDB = "1 series"
+            if 'bmw 1' in name_db.lower():  # BMW
+                marka_db = "BMW"
+                model_db = "1 series"
                 chars += '|312|'
-            if 'bmw 3' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "3 series"
+            if 'bmw 3' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "3 series"
                 chars += '|313|'
-            if 'bmw 5' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "5 series"
+            if 'bmw 5' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "5 series"
                 chars += '|314|'
-            if 'bmw 7' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "7 series"
+            if 'bmw 7' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "7 series"
                 chars += '|315|'
-            if 'bmw 6' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "6 series"
+            if 'bmw 6' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "6 series"
                 chars += '|316|'
-            if 'bmw 4' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "4 series"
+            if 'bmw 4' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "4 series"
                 chars += '|317|'
-            if 'bmw 2' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "2 series"
+            if 'bmw 2' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "2 series"
                 chars += '|318|'
-            if 'bmw 8' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "8 series"
+            if 'bmw 8' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "8 series"
                 chars += '|319|'
-            if 'bmw mini ' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "MINI"
+            if 'bmw mini ' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "MINI"
                 chars += '|320|'
-            if 'bmw gt' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "GT"
+            if 'bmw gt' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "GT"
                 chars += '|321|'
-            if 'bmw m' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "M"
+            if 'bmw m' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "M"
                 chars += '|322|'
-            if 'bmw x' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "X"
+            if 'bmw x' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "X"
                 chars += '|323|'
-            if 'bmw z' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "Z"
+            if 'bmw z' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "Z"
                 chars += '|324|'
-            if 'bmw i' in nameDB.lower():
-                markaDB = "BMW"
-                modelDB = "I"
+            if 'bmw i' in name_db.lower():
+                marka_db = "BMW"
+                model_db = "I"
                 chars += '|325|'
-            if 'cadillac' in nameDB.lower():  # Cadillac
-                markaDB = "Cadillac"
-                modelDB = "Cadillac"
+            if 'cadillac' in name_db.lower():  # Cadillac
+                marka_db = "Cadillac"
+                model_db = "Cadillac"
                 chars += '|326|'
-            if 'cadillac' in nameDB.lower() and 'sts' in nameDB.lower():
-                markaDB = "Cadillac"
-                modelDB = "STS"
+            if 'cadillac' in name_db.lower() and 'sts' in name_db.lower():
+                marka_db = "Cadillac"
+                model_db = "STS"
                 chars += '|327|'
-            if 'cadillac' in nameDB.lower() and 'cts' in nameDB.lower():
-                markaDB = "Cadillac"
-                modelDB = "CTS"
+            if 'cadillac' in name_db.lower() and 'cts' in name_db.lower():
+                marka_db = "Cadillac"
+                model_db = "CTS"
                 chars += '|328|'
-            if 'cadillac' in nameDB.lower() and 'escalade' in nameDB.lower():
-                markaDB = "Cadillac"
-                modelDB = "Escalade"
+            if 'cadillac' in name_db.lower() and 'escalade' in name_db.lower():
+                marka_db = "Cadillac"
+                model_db = "Escalade"
                 chars += '|329|'
-            if 'cadillac' in nameDB.lower() and 'ct6' in nameDB.lower():
-                markaDB = "Cadillac"
-                modelDB = "CT6"
+            if 'cadillac' in name_db.lower() and 'ct6' in name_db.lower():
+                marka_db = "Cadillac"
+                model_db = "CT6"
                 chars += '|330|'
-            if 'cadillac' in nameDB.lower() and 'xt5' in nameDB.lower():
-                markaDB = "Cadillac"
-                modelDB = "XT5"
+            if 'cadillac' in name_db.lower() and 'xt5' in name_db.lower():
+                marka_db = "Cadillac"
+                model_db = "XT5"
                 chars += '|331|'
-            if 'wrangler' in nameDB.lower():  # Chrysler/Jeep
-                markaDB = "Jeep"
-                modelDB = "Wrangler"
+            if 'wrangler' in name_db.lower():  # Chrysler/Jeep
+                marka_db = "Jeep"
+                model_db = "Wrangler"
                 chars += '|332|'
-            if 'cherokee' in nameDB.lower():
-                markaDB = "Jeep"
-                modelDB = "Cherokee"
+            if 'cherokee' in name_db.lower():
+                marka_db = "Jeep"
+                model_db = "Cherokee"
                 chars += '|333|'
-            if 'caravan' in nameDB.lower():
-                markaDB = "Chrysler"
-                modelDB = "Caravan"
+            if 'caravan' in name_db.lower():
+                marka_db = "Chrysler"
+                model_db = "Caravan"
                 chars += '|334|'
-            if 'chrysler 300c' in nameDB.lower():
-                markaDB = "Chrysler"
-                modelDB = "300C"
+            if 'chrysler 300c' in name_db.lower():
+                marka_db = "Chrysler"
+                model_db = "300C"
                 chars += '|335|'
-            if 'chrysler 300m' in nameDB.lower():
-                markaDB = "Chrysler"
-                modelDB = "300M"
+            if 'chrysler 300m' in name_db.lower():
+                marka_db = "Chrysler"
+                model_db = "300M"
                 chars += '|336|'
-            if 'renegade' in nameDB.lower():
-                markaDB = "Jeep"
-                modelDB = "Renegad"
+            if 'renegade' in name_db.lower():
+                marka_db = "Jeep"
+                model_db = "Renegad"
                 chars += '|337|'
-            if 'ds3 ' in nameDB.lower():  # Citroen
-                markaDB = "Citroen"
-                modelDB = "DS3"
+            if 'ds3 ' in name_db.lower():  # Citroen
+                marka_db = "Citroen"
+                model_db = "DS3"
                 chars += '|338|'
-            if 'ds4 ' in nameDB.lower():
-                markaDB = "Citroen"
-                modelDB = "DS4"
+            if 'ds4 ' in name_db.lower():
+                marka_db = "Citroen"
+                model_db = "DS4"
                 chars += '|339|'
-            if 'ds5 ' in nameDB.lower():
-                markaDB = "Citroen"
-                modelDB = "DS5"
+            if 'ds5 ' in name_db.lower():
+                marka_db = "Citroen"
+                model_db = "DS5"
                 chars += '|340|'
-            if 'cactus' in nameDB.lower():
-                markaDB = "Citroen"
-                modelDB = "Cactus"
+            if 'cactus' in name_db.lower():
+                marka_db = "Citroen"
+                model_db = "Cactus"
                 chars += '|341|'
-            if 'c3 ' in nameDB.lower():
-                markaDB = "Citroen"
-                modelDB = "C3"
+            if 'c3 ' in name_db.lower():
+                marka_db = "Citroen"
+                model_db = "C3"
                 chars += '|342|'
-            if 'c4 ' in nameDB.lower():
-                markaDB = "Citroen"
-                modelDB = "C4"
+            if 'c4 ' in name_db.lower():
+                marka_db = "Citroen"
+                model_db = "C4"
                 chars += '|343|'
-            if 'c5 ' in nameDB.lower():
-                markaDB = "Citroen"
-                modelDB = "C5"
+            if 'c5 ' in name_db.lower():
+                marka_db = "Citroen"
+                model_db = "C5"
                 chars += '|344|'
-            if 'fiat' in nameDB.lower() and '500' in nameDB.lower():  # Fiat
-                markaDB = "Fiat"
-                modelDB = "500"
+            if 'fiat' in name_db.lower() and '500' in name_db.lower():  # Fiat
+                marka_db = "Fiat"
+                model_db = "500"
                 chars += '|345|'
-            if 'fremont' in nameDB.lower():
-                markaDB = "Fiat"
-                modelDB = "Fremont"
+            if 'fremont' in name_db.lower():
+                marka_db = "Fiat"
+                model_db = "Fremont"
                 chars += '|346|'
-            if 'ford focus' in nameDB.lower():  # Ford
-                markaDB = "Ford"
-                modelDB = "Focus"
+            if 'ford focus' in name_db.lower():  # Ford
+                marka_db = "Ford"
+                model_db = "Focus"
                 chars += '|347|'
-            if 'ford fusion' in nameDB.lower():
-                markaDB = "Ford"
-                modelDB = "Fusion"
+            if 'ford fusion' in name_db.lower():
+                marka_db = "Ford"
+                model_db = "Fusion"
                 chars += '|348|'
-            if 'ford explorer' in nameDB.lower() or 'explorer' in nameDB.lower():
-                markaDB = "Ford"
-                modelDB = "Explorer"
+            if 'ford explorer' in name_db.lower() or 'explorer' in name_db.lower():
+                marka_db = "Ford"
+                model_db = "Explorer"
                 chars += '|349|'
-            if 'ford taurus' in nameDB.lower():
-                markaDB = "Ford"
-                modelDB = "Taurus"
+            if 'ford taurus' in name_db.lower():
+                marka_db = "Ford"
+                model_db = "Taurus"
                 chars += '|350|'
-            if 'ford excape' in nameDB.lower():
-                markaDB = "Ford"
-                modelDB = "Escape"
+            if 'ford excape' in name_db.lower():
+                marka_db = "Ford"
+                model_db = "Escape"
                 chars += '|351|'
-            if 'ford mustang' in nameDB.lower():
-                markaDB = "Ford"
-                modelDB = "Mustang"
+            if 'ford mustang' in name_db.lower():
+                marka_db = "Ford"
+                model_db = "Mustang"
                 chars += '|352|'
-            if 'mondeo' in nameDB.lower():
-                markaDB = "Ford"
-                modelDB = "Mondeo"
+            if 'mondeo' in name_db.lower():
+                marka_db = "Ford"
+                model_db = "Mondeo"
                 chars += '|353|'
-            if 'ford 500' in nameDB.lower():
-                markaDB = "Ford"
-                modelDB = "500"
+            if 'ford 500' in name_db.lower():
+                marka_db = "Ford"
+                model_db = "500"
                 chars += '|345|'
-            if 'kuga' in nameDB.lower():
-                markaDB = "Ford"
-                modelDB = "Kuga"
+            if 'kuga' in name_db.lower():
+                marka_db = "Ford"
+                model_db = "Kuga"
                 chars += '|354|'
-            if 'chevy' in nameDB.lower() and 'van' in nameDB.lower():  # Chevy
-                markaDB = "Chevy"
-                modelDB = "VAN"
+            if 'chevy' in name_db.lower() and 'van' in name_db.lower():  # Chevy
+                marka_db = "Chevy"
+                model_db = "VAN"
                 chars += '|355|'
-            if 'honda civic' in nameDB.lower():  # Honda
-                markaDB = "Honda"
-                modelDB = "Civic"
+            if 'honda civic' in name_db.lower():  # Honda
+                marka_db = "Honda"
+                model_db = "Civic"
                 chars += '|356|'
-            if 'honda accord' in nameDB.lower() or 'agreement' in nameDB.lower():
-                markaDB = "Honda"
-                modelDB = "Accord"
+            if 'honda accord' in name_db.lower() or 'agreement' in name_db.lower():
+                marka_db = "Honda"
+                model_db = "Accord"
                 chars += '|357|'
-            if 'cr-v' in nameDB.lower():
-                markaDB = "Honda"
-                modelDB = "CR-V"
+            if 'cr-v' in name_db.lower():
+                marka_db = "Honda"
+                model_db = "CR-V"
                 chars += '|358|'
-            if 'odyssey' in nameDB.lower():
-                markaDB = "Honda"
-                modelDB = "Odyssey"
+            if 'odyssey' in name_db.lower():
+                marka_db = "Honda"
+                model_db = "Odyssey"
                 chars += '|359|'
-            if 'pilot' in nameDB.lower():
-                markaDB = "Honda"
-                modelDB = "Pilot"
+            if 'pilot' in name_db.lower():
+                marka_db = "Honda"
+                model_db = "Pilot"
                 chars += '|360|'
-            if 'cr-z' in nameDB.lower():
-                markaDB = "Honda"
-                modelDB = "CR-Z"
+            if 'cr-z' in name_db.lower():
+                marka_db = "Honda"
+                model_db = "CR-Z"
                 chars += '|361|'
-            if 's660' in nameDB.lower():
-                markaDB = "Honda"
-                modelDB = "S660"
+            if 's660' in name_db.lower():
+                marka_db = "Honda"
+                model_db = "S660"
                 chars += '|362|'
-            if 'jaguar' in nameDB.lower() and 'xf' in nameDB.lower():  # Jaguar
-                markaDB = "Jaguar"
-                modelDB = "XF"
+            if 'jaguar' in name_db.lower() and 'xf' in name_db.lower():  # Jaguar
+                marka_db = "Jaguar"
+                model_db = "XF"
                 chars += '|363|'
-            if 'jaguar' in nameDB.lower() and 'xj' in nameDB.lower():
-                markaDB = "Jaguar"
-                modelDB = "XJ"
+            if 'jaguar' in name_db.lower() and 'xj' in name_db.lower():
+                marka_db = "Jaguar"
+                model_db = "XJ"
                 chars += '|364|'
-            if 'f-type' in nameDB.lower():
-                markaDB = "Jaguar"
-                modelDB = "F-Type"
+            if 'f-type' in name_db.lower():
+                marka_db = "Jaguar"
+                model_db = "F-Type"
                 chars += '|365|'
-            if 'jaguar' in nameDB.lower() and '20d' in nameDB.lower():
-                markaDB = "Jaguar"
-                modelDB = "XE"
+            if 'jaguar' in name_db.lower() and '20d' in name_db.lower():
+                marka_db = "Jaguar"
+                model_db = "XE"
                 chars += '|366|'
-            if 'discovery' in nameDB.lower():  # Land Rover
-                markaDB = "Land Rover"
-                modelDB = "Discovery"
+            if 'discovery' in name_db.lower():  # Land Rover
+                marka_db = "Land Rover"
+                model_db = "Discovery"
                 chars += '|367|'
-            if 'range rover' in nameDB.lower():
-                markaDB = "Land Rover"
-                modelDB = "Range Rover"
+            if 'range rover' in name_db.lower():
+                marka_db = "Land Rover"
+                model_db = "Range Rover"
                 chars += '|368|'
-            if 'freelander' in nameDB.lower():
-                markaDB = "Land Rover"
-                modelDB = "Freelander"
+            if 'freelander' in name_db.lower():
+                marka_db = "Land Rover"
+                model_db = "Freelander"
                 chars += '|369|'
-            if 'defender' in nameDB.lower():
-                markaDB = "Land Rover"
-                modelDB = "Defender"
+            if 'defender' in name_db.lower():
+                marka_db = "Land Rover"
+                model_db = "Defender"
                 chars += '|370|'
-            if 'mks' in nameDB.lower():  # Lincoln
-                markaDB = "Lincoln"
-                modelDB = "MKS"
+            if 'mks' in name_db.lower():  # Lincoln
+                marka_db = "Lincoln"
+                model_db = "MKS"
                 chars += '|371|'
-            if 'mkx' in nameDB.lower():
-                markaDB = "Lincoln"
-                modelDB = "MKX"
+            if 'mkx' in name_db.lower():
+                marka_db = "Lincoln"
+                model_db = "MKX"
                 chars += '|372|'
-            if 'mkz' in nameDB.lower():
-                markaDB = "Lincoln"
-                modelDB = "MKZ"
+            if 'mkz' in name_db.lower():
+                marka_db = "Lincoln"
+                model_db = "MKZ"
                 chars += '|373|'
-            if 'mkc' in nameDB.lower():
-                markaDB = "Lincoln"
-                modelDB = "MKC"
+            if 'mkc' in name_db.lower():
+                marka_db = "Lincoln"
+                model_db = "MKC"
                 chars += '|374|'
-            if 'levante' in nameDB.lower():  # Maserati
-                markaDB = "Maserati"
-                modelDB = "Levante"
+            if 'levante' in name_db.lower():  # Maserati
+                marka_db = "Maserati"
+                model_db = "Levante"
                 chars += '|375|'
-            if 'ghibli' in nameDB.lower():
-                markaDB = "Maserati"
-                modelDB = "Ghibli"
+            if 'ghibli' in name_db.lower():
+                marka_db = "Maserati"
+                model_db = "Ghibli"
                 chars += '|376|'
-            if 'benz b' in nameDB.lower():  # Mercedes Benz
-                markaDB = "Mercedes Benz"
-                modelDB = "B Class"
+            if 'benz b' in name_db.lower():  # Mercedes Benz
+                marka_db = "Mercedes Benz"
+                model_db = "B Class"
                 chars += '|377|'
-            if 'benz c ' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "C Class"
+            if 'benz c ' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "C Class"
                 chars += '|378|'
-            if 'benz cls' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "CLS Class"
+            if 'benz cls' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "CLS Class"
                 chars += '|379|'
-            if 'benz e' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "E Class"
+            if 'benz e' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "E Class"
                 chars += '|380|'
-            if 'benz glk' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "GLK Class"
+            if 'benz glk' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "GLK Class"
                 chars += '|381|'
-            if 'benz m ' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "M Class"
+            if 'benz m ' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "M Class"
                 chars += '|382|'
-            if 'benz ml' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "ML Class"
+            if 'benz ml' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "ML Class"
                 chars += '|383|'
-            if 'benz s ' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "S Class"
+            if 'benz s ' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "S Class"
                 chars += '|384|'
-            if 'benz slk' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "SLK Class"
+            if 'benz slk' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "SLK Class"
                 chars += '|385|'
-            if 'benz g ' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "G Class"
+            if 'benz g ' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "G Class"
                 chars += '|386|'
-            if 'benz sprinter' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "Sprinter"
+            if 'benz sprinter' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "Sprinter"
                 chars += '|387|'
-            if 'benz a ' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "A Class"
+            if 'benz a ' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "A Class"
                 chars += '|388|'
-            if 'benz cla' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "CLA Class"
+            if 'benz cla' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "CLA Class"
                 chars += '|389|'
-            if 'benz gla' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "GLA Class"
+            if 'benz gla' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "GLA Class"
                 chars += '|390|'
-            if 'benz gt' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "GT"
+            if 'benz gt' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "GT"
                 chars += '|321|'
-            if 'benz glc' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "GLC Class"
+            if 'benz glc' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "GLC Class"
                 chars += '|391|'
-            if 'benz gle' in nameDB.lower():
-                markaDB = "Mercedes Benz"
-                modelDB = "GLE Class"
+            if 'benz gle' in name_db.lower():
+                marka_db = "Mercedes Benz"
+                model_db = "GLE Class"
                 chars += '|392|'
-            if 'lancer' in nameDB.lower():  # Mitsibishi
-                markaDB = "Mitsibishi"
-                modelDB = "Lancer"
+            if 'lancer' in name_db.lower():  # Mitsibishi
+                marka_db = "Mitsibishi"
+                model_db = "Lancer"
                 chars += '|393|'
-            if 'outlander' in nameDB.lower():
-                markaDB = "Mitsibishi"
-                modelDB = "Outlander"
+            if 'outlander' in name_db.lower():
+                marka_db = "Mitsibishi"
+                model_db = "Outlander"
                 chars += '|394|'
-            if 'rogue' in nameDB.lower():  # Nissan
-                markaDB = "Nissan"
-                modelDB = "Rogue"
+            if 'rogue' in name_db.lower():  # Nissan
+                marka_db = "Nissan"
+                model_db = "Rogue"
                 chars += '|395|'
-            if 'murano' in nameDB.lower():
-                markaDB = "Nissan"
-                modelDB = "Murano"
+            if 'murano' in name_db.lower():
+                marka_db = "Nissan"
+                model_db = "Murano"
                 chars += '|396|'
-            if 'altima' in nameDB.lower():
-                markaDB = "Nissan"
-                modelDB = "Altima"
+            if 'altima' in name_db.lower():
+                marka_db = "Nissan"
+                model_db = "Altima"
                 chars += '|397|'
-            if 'cube' in nameDB.lower():
-                markaDB = "Nissan"
-                modelDB = "Cube"
+            if 'cube' in name_db.lower():
+                marka_db = "Nissan"
+                model_db = "Cube"
                 chars += '|398|'
-            if 'nissan juke' in nameDB.lower():
-                markaDB = "Nissan"
-                modelDB = "Juke"
+            if 'nissan juke' in name_db.lower():
+                marka_db = "Nissan"
+                model_db = "Juke"
                 chars += '|399|'
-            if 'nissan path' in nameDB.lower():
-                markaDB = "Nissan"
-                modelDB = "Pathfinder"
+            if 'nissan path' in name_db.lower():
+                marka_db = "Nissan"
+                model_db = "Pathfinder"
                 chars += '|400|'
-            if 'nissan qashqai' in nameDB.lower():
-                markaDB = "Nissan"
-                modelDB = "Qashqai"
+            if 'nissan qashqai' in name_db.lower():
+                marka_db = "Nissan"
+                model_db = "Qashqai"
                 chars += '|401|'
-            if 'nissan maxima' in nameDB.lower():
-                markaDB = "Nissan"
-                modelDB = "Maxima"
+            if 'nissan maxima' in name_db.lower():
+                marka_db = "Nissan"
+                model_db = "Maxima"
                 chars += '|402|'
-            if 'infinity fx' in nameDB.lower():  # Infinity
-                markaDB = "Infinity"
-                modelDB = "FX"
+            if 'infinity fx' in name_db.lower():  # Infinity
+                marka_db = "Infinity"
+                model_db = "FX"
                 chars += '|403|'
-            if 'infinity g' in nameDB.lower():
-                markaDB = "Infinity"
-                modelDB = "G"
+            if 'infinity g' in name_db.lower():
+                marka_db = "Infinity"
+                model_db = "G"
                 chars += '|404|'
-            if 'infinity m' in nameDB.lower():
-                markaDB = "Infinity"
-                modelDB = "M"
+            if 'infinity m' in name_db.lower():
+                marka_db = "Infinity"
+                model_db = "M"
                 chars += '|322|'
-            if 'infinity qx' in nameDB.lower():
-                markaDB = "Infinity"
-                modelDB = "QX"
+            if 'infinity qx' in name_db.lower():
+                marka_db = "Infinity"
+                model_db = "QX"
                 chars += '|405|'
-            if 'infinity q ' in nameDB.lower():
-                markaDB = "Infinity"
-                modelDB = "Q"
+            if 'infinity q ' in name_db.lower():
+                marka_db = "Infinity"
+                model_db = "Q"
                 chars += '|406|'
-            if 'peugeot 207' in nameDB.lower():  # Peugeot
-                markaDB = "Peugeot"
-                modelDB = "207"
+            if 'peugeot 207' in name_db.lower():  # Peugeot
+                marka_db = "Peugeot"
+                model_db = "207"
                 chars += '|407|'
-            if 'peugeot 307' in nameDB.lower():
-                markaDB = "Peugeot"
-                modelDB = "307"
+            if 'peugeot 307' in name_db.lower():
+                marka_db = "Peugeot"
+                model_db = "307"
                 chars += '|408|'
-            if 'peugeot 308' in nameDB.lower():
-                markaDB = "Peugeot"
-                modelDB = "308"
+            if 'peugeot 308' in name_db.lower():
+                marka_db = "Peugeot"
+                model_db = "308"
                 chars += '|409|'
-            if 'peugeot 407' in nameDB.lower():
-                markaDB = "Peugeot"
-                modelDB = "407"
+            if 'peugeot 407' in name_db.lower():
+                marka_db = "Peugeot"
+                model_db = "407"
                 chars += '|410|'
-            if 'peugeot 508' in nameDB.lower():
-                markaDB = "Peugeot"
-                modelDB = "508"
+            if 'peugeot 508' in name_db.lower():
+                marka_db = "Peugeot"
+                model_db = "508"
                 chars += '|411|'
-            if 'peugeot 3008' in nameDB.lower():
-                markaDB = "Peugeot"
-                modelDB = "3008"
+            if 'peugeot 3008' in name_db.lower():
+                marka_db = "Peugeot"
+                model_db = "3008"
                 chars += '|412|'
-            if 'peugeot 208' in nameDB.lower():
-                markaDB = "Peugeot"
-                modelDB = "208"
+            if 'peugeot 208' in name_db.lower():
+                marka_db = "Peugeot"
+                model_db = "208"
                 chars += '|413|'
-            if 'peugeot 2008' in nameDB.lower():
-                markaDB = "Peugeot"
-                modelDB = "2008"
+            if 'peugeot 2008' in name_db.lower():
+                marka_db = "Peugeot"
+                model_db = "2008"
                 chars += '|414|'
-            if 'peugeot 5008' in nameDB.lower():
-                markaDB = "Peugeot"
-                modelDB = "5008"
+            if 'peugeot 5008' in name_db.lower():
+                marka_db = "Peugeot"
+                model_db = "5008"
                 chars += '|415|'
-            if 'porche panamera' in nameDB.lower():  # Porche
-                markaDB = "Porche"
-                modelDB = "Panamera"
+            if 'porche panamera' in name_db.lower():  # Porche
+                marka_db = "Porche"
+                model_db = "Panamera"
                 chars += '|416|'
-            if 'porche cayman' in nameDB.lower():
-                markaDB = "Porche"
-                modelDB = "Cayman"
+            if 'porche cayman' in name_db.lower():
+                marka_db = "Porche"
+                model_db = "Cayman"
                 chars += '|417|'
-            if 'porche cayenne' in nameDB.lower():
-                markaDB = "Porche"
-                modelDB = "Cayenne"
+            if 'porche cayenne' in name_db.lower():
+                marka_db = "Porche"
+                model_db = "Cayenne"
                 chars += '|418|'
-            if 'saab 9-3' in nameDB.lower():  # Saab
-                markaDB = "Saab"
-                modelDB = "9-3"
+            if 'saab 9-3' in name_db.lower():  # Saab
+                marka_db = "Saab"
+                model_db = "9-3"
                 chars += '|419|'
-            if 'saab 9-5' in nameDB.lower():
-                markaDB = "Saab"
-                modelDB = "9-5"
+            if 'saab 9-5' in name_db.lower():
+                marka_db = "Saab"
+                model_db = "9-5"
                 chars += '|420|'
-            if 'beetle' in nameDB.lower():  # Volkswagen
-                markaDB = "Volkswagen"
-                modelDB = "Beetle"
+            if 'beetle' in name_db.lower():  # Volkswagen
+                marka_db = "Volkswagen"
+                model_db = "Beetle"
                 chars += '|421|'
-            if 'volkswagen jetta' in nameDB.lower():
-                markaDB = "Volkswagen"
-                modelDB = "Jetta"
+            if 'volkswagen jetta' in name_db.lower():
+                marka_db = "Volkswagen"
+                model_db = "Jetta"
                 chars += '|422|'
-            if 'volkswagen passat' in nameDB.lower():
-                markaDB = "Volkswagen"
-                modelDB = "Passat"
+            if 'volkswagen passat' in name_db.lower():
+                marka_db = "Volkswagen"
+                model_db = "Passat"
                 chars += '|423|'
-            if 'volkswagen phaeton' in nameDB.lower():
-                markaDB = "Volkswagen"
-                modelDB = "Phaeton"
+            if 'volkswagen phaeton' in name_db.lower():
+                marka_db = "Volkswagen"
+                model_db = "Phaeton"
                 chars += '|424|'
-            if 'volkswagen golf' in nameDB.lower():
-                markaDB = "Volkswagen"
-                modelDB = "Golf"
+            if 'volkswagen golf' in name_db.lower():
+                marka_db = "Volkswagen"
+                model_db = "Golf"
                 chars += '|425|'
-            if 'tiguan' in nameDB.lower():
-                markaDB = "Volkswagen"
-                modelDB = "Tiguan"
+            if 'tiguan' in name_db.lower():
+                marka_db = "Volkswagen"
+                model_db = "Tiguan"
                 chars += '|426|'
-            if 'volkswagen touareg' in nameDB.lower():
-                markaDB = "Volkswagen"
-                modelDB = "Touareg"
+            if 'volkswagen touareg' in name_db.lower():
+                marka_db = "Volkswagen"
+                model_db = "Touareg"
                 chars += '|427|'
-            if 'volkswagen scirocco' in nameDB.lower():
-                markaDB = "Volkswagen"
-                modelDB = "Scirocco"
+            if 'volkswagen scirocco' in name_db.lower():
+                marka_db = "Volkswagen"
+                model_db = "Scirocco"
                 chars += '|428|'
-            if 'volkswagen polo' in nameDB.lower():
-                markaDB = "Volkswagen"
-                modelDB = "Polo"
+            if 'volkswagen polo' in name_db.lower():
+                marka_db = "Volkswagen"
+                model_db = "Polo"
                 chars += '|429|'
-            if 'volvo s60' in nameDB.lower():  # Volvo
-                markaDB = "Volvo"
-                modelDB = "S60"
+            if 'volvo s60' in name_db.lower():  # Volvo
+                marka_db = "Volvo"
+                model_db = "S60"
                 chars += '|430|'
-            if 'volvo s80' in nameDB.lower():
-                markaDB = "Volvo"
-                modelDB = "S80"
+            if 'volvo s80' in name_db.lower():
+                marka_db = "Volvo"
+                model_db = "S80"
                 chars += '|431|'
-            if 'volvo xc60' in nameDB.lower():
-                markaDB = "Volvo"
-                modelDB = "XC60"
+            if 'volvo xc60' in name_db.lower():
+                marka_db = "Volvo"
+                model_db = "XC60"
                 chars += '|432|'
-            if 'volvo xc70' in nameDB.lower():
-                markaDB = "Volvo"
-                modelDB = "XC70"
+            if 'volvo xc70' in name_db.lower():
+                marka_db = "Volvo"
+                model_db = "XC70"
                 chars += '|433|'
-            if 'volvo xc90' in nameDB.lower():
-                markaDB = "Volvo"
-                modelDB = "XC90"
+            if 'volvo xc90' in name_db.lower():
+                marka_db = "Volvo"
+                model_db = "XC90"
                 chars += '|434|'
-            if 'volvo s40' in nameDB.lower():
-                markaDB = "Volvo"
-                modelDB = "S40"
+            if 'volvo s40' in name_db.lower():
+                marka_db = "Volvo"
+                model_db = "S40"
                 chars += '|435|'
-            if 'volvo v60' in nameDB.lower():
-                markaDB = "Volvo"
-                modelDB = "V60"
+            if 'volvo v60' in name_db.lower():
+                marka_db = "Volvo"
+                model_db = "V60"
                 chars += '|436|'
-            if 'volvo v40' in nameDB.lower():
-                markaDB = "Volvo"
-                modelDB = "V40"
+            if 'volvo v40' in name_db.lower():
+                marka_db = "Volvo"
+                model_db = "V40"
                 chars += '437'
-            if 'volvo s90' in nameDB.lower():
-                markaDB = "Volvo"
-                modelDB = "S90"
+            if 'volvo s90' in name_db.lower():
+                marka_db = "Volvo"
+                model_db = "S90"
                 chars += '|438|'
-            if 'hustler' in nameDB.lower():  # Suzuki
-                markaDB = "Suzuki"
-                modelDB = "Hustler"
+            if 'hustler' in name_db.lower():  # Suzuki
+                marka_db = "Suzuki"
+                model_db = "Hustler"
                 chars += '|439|'
-            if 'tata daewoo' in nameDB.lower():  # Daewoo
-                markaDB = "Daewoo"
-                modelDB = "Tata"
+            if 'tata daewoo' in name_db.lower():  # Daewoo
+                marka_db = "Daewoo"
+                model_db = "Tata"
                 chars += '|440|'
 
-            if markaDB == 'Kia':
+            if marka_db == 'Kia':
                 chars += '|86|'
-            if markaDB == 'Hyundai':
+            if marka_db == 'Hyundai':
                 chars += '|85|'
-            if markaDB == 'Toyota':
+            if marka_db == 'Toyota':
                 chars += '|115|'
-            if markaDB == 'Lexus':
+            if marka_db == 'Lexus':
                 chars += '|107|'
-            if markaDB == 'Genesis':
+            if marka_db == 'Genesis':
                 chars += '|93|'
-            if markaDB == 'GM':
+            if marka_db == 'GM':
                 chars += '|87|'
-            if markaDB == 'Renault Samsung':
+            if marka_db == 'Renault Samsung':
                 chars += '|88|'
-            if markaDB == 'Ssangyong':
+            if marka_db == 'Ssangyong':
                 chars += '|89|'
-            if markaDB == 'Aston Martin':
+            if marka_db == 'Aston Martin':
                 chars += '|146|'
-            if markaDB == 'Audi':
+            if marka_db == 'Audi':
                 chars += '|147|'
-            if markaDB == 'Bentley':
+            if marka_db == 'Bentley':
                 chars += '|148|'
-            if markaDB == 'BMW' or 'BMW' in nameDB:
+            if marka_db == 'BMW' or 'BMW' in name_db:
                 chars += '|149|'
-            if markaDB == 'Cadillac':
+            if marka_db == 'Cadillac':
                 chars += '|150|'
-            if markaDB == 'Chrysler':
+            if marka_db == 'Chrysler':
                 chars += '|151|'
-            if markaDB == 'Jeep':
+            if marka_db == 'Jeep':
                 chars += '|152|'
-            if markaDB == 'Citroen':
+            if marka_db == 'Citroen':
                 chars += '|153|'
-            if markaDB == 'Fiat':
+            if marka_db == 'Fiat':
                 chars += '|154|'
-            if markaDB == 'Ford':
+            if marka_db == 'Ford':
                 chars += '|155|'
-            if markaDB == 'Chevy':
+            if marka_db == 'Chevy':
                 chars += '|156|'
-            if markaDB == 'Honda':
+            if marka_db == 'Honda':
                 chars += '|157|'
-            if markaDB == 'Jaguar':
+            if marka_db == 'Jaguar':
                 chars += '|158|'
-            if markaDB == 'Land Rover':
+            if marka_db == 'Land Rover':
                 chars += '|159|'
-            if markaDB == 'Lincoln':
+            if marka_db == 'Lincoln':
                 chars += '|160|'
-            if markaDB == 'Maserati':
+            if marka_db == 'Maserati':
                 chars += '|161|'
-            if markaDB == 'Mercedes Benz':
+            if marka_db == 'Mercedes Benz':
                 chars += '|162|'
-            if markaDB == 'Mitsubishi':
+            if marka_db == 'Mitsubishi':
                 chars += '|163|'
-            if markaDB == 'Nissan':
+            if marka_db == 'Nissan':
                 chars += '|164|'
-            if markaDB == 'Infinity':
+            if marka_db == 'Infinity':
                 chars += '|165|'
-            if markaDB == 'Peugeot':
+            if marka_db == 'Peugeot':
                 chars += '|166|'
-            if markaDB == 'Porsche':
+            if marka_db == 'Porsche':
                 chars += '|167|'
-            if markaDB == 'Saab':
+            if marka_db == 'Saab':
                 chars += '|168|'
-            if markaDB == 'Volkswagen':
+            if marka_db == 'Volkswagen':
                 chars += '|169|'
-            if markaDB == 'Volvo':
+            if marka_db == 'Volvo':
                 chars += '|170|'
-            if markaDB == 'Suzuki':
+            if marka_db == 'Suzuki':
                 chars += '|171|'
-            if markaDB == 'Rolls Royce':
+            if marka_db == 'Rolls Royce':
                 chars += '|172|'
 
-            carClass = str.replace(nameDB, markaDB.upper(), "")
-            carClass = str.replace(carClass, modelDB.upper(), "")
-            carClass = str.replace(carClass, f"{engineCapacityDB}", "")
-            carClass = str.replace(carClass, "(D)", "")
-            carClass = str.replace(carClass, "(L)", "")
-            carClass = str.replace(carClass, "(G)", "")
-            carClass = str.replace(carClass, "2WD", "")
-            carClass = str.replace(carClass, "4WD", "")
-            carClass = str.replace(carClass, "AWD", "")
+            car_class = str.replace(name_db, marka_db.upper(), "")
+            car_class = str.replace(car_class, model_db.upper(), "")
+            car_class = str.replace(car_class, f"{engine_capacity_db}", "")
+            car_class = str.replace(car_class, "(D)", "")
+            car_class = str.replace(car_class, "(L)", "")
+            car_class = str.replace(car_class, "(G)", "")
+            car_class = str.replace(car_class, "2WD", "")
+            car_class = str.replace(car_class, "4WD", "")
+            car_class = str.replace(car_class, "AWD", "")
 
             # DateTimeStamp
-            timeNow = str(datetime.now())
+            time_now = str(datetime.now())
 
             # Text
             descript = '<dl><dt class="dttle">Информация</dt>' \
-                       f'<dd><span class="t">Номер лота: {entryNum}</span></dd>' \
-                       f'<dd><span class="t">На аукционе с: {entryDate}</span></dd>' \
-                       f'<dd><span class="t">Дата первичной регистрации: {regYear}</span></dd>' \
-                       f'<dd><span class="t">Номерной знак: {carNumber}</span></dd>' \
+                       f'<dd><span class="t">Номер лота: {entry_num}</span></dd>' \
+                       f'<dd><span class="t">На аукционе с: {entry_date}</span></dd>' \
+                       f'<dd><span class="t">Дата первичной регистрации: {reg_year}</span></dd>' \
+                       f'<dd><span class="t">Номерной знак: {car_number}</span></dd>' \
                        f'<dd><span class="t">VIN-номер: {vin}</span></dd>' \
                        f'<dd><span class="t">Статус: {progress}</span></dd>' \
                        f'<dd><span class="t">Оценка: {points}</span></dd></dl>'
-            textDB = descript
+            text_db = descript
 
             # Transfer
-            if markaDB == "":
+            if marka_db == "":
                 print("Vehicle was not recognized. Skipped")
             else:
-                print('Parsing', markaDB, modelDB, yearManDB)
+                print('Parsing', marka_db, model_db, year_man_db)
 
-                insertQuery = f"INSERT INTO `ns_goods`" \
+                insert_query = f"INSERT INTO `ns_goods`" \
                               f"(`topItem`, `tree`, `parent`, `visible`, `url`, `mainImage`, `popular`, `name`, `number`, `title`, `description`, `keywords`, `mainPrice`, `priceAllin`, `code`, `chars`, `brandId`, `price`, `units`, `info`, `textRight`, `text`, `changefreq`, `lastmod`, `priority`, `startPrice`, `valuteId`, `attributes`, `newItem`, `actPrice`, `startActPrice`, `attrPrice`, `actAttrPrice`, `mainAttrPrice`, `tree1`, `statusId`, `supplierCode`, `zakPrice`, `supplierId`, `upload`, `canBuy`, `quantity`, `percent`, `actionTime`, `actDate`, `actTime`, `tempid`, `colcom`, `rating`, `inOrder`, `marka`, `model`, `engineType`, `engineСapacity`, `mileage`, `transmission`, `driveType`, `yearMan`, `auctionMark`) " \
-                              f"VALUES(1, '|96|', 96, 1, '{URL}', 'img//uploads//prebg//{URL}(1).jpg', 0, '{nameDB}', 100, '', '', '', {price}, '{videoUrl}', '{vin}', '{chars}', 0, {price}, '', '', '', '{textDB}', 'always', '{timeNow}', 0.9, {price}, 1, '', 1, 0, 0, {price}, 0, {price}, '|96|', 7, '', 0, 0, 0, 1, 0, 0, 0, 0, '', '', 0, 0, 0, '{markaDB}', '{modelDB}', '{engineTypeDB}', '{engineCapacityDB}', {mileageDB}, '{transmissionDB}', '{driveTypeDB}', '{yearManDB}', '{points}')"
-                executeQuery(connect, insertQuery, 'Row')
+                              f"VALUES(1, '|96|', 96, 1, '{url}', 'img//uploads//prebg//{url}(1).jpg', 0, '{name_db}', 100, '', '', '', {price}, '{video_url}', '{vin}', '{chars}', 0, {price}, '', '', '', '{text_db}', 'always', '{time_now}', 0.9, {price}, 1, '', 1, 0, 0, {price}, 0, {price}, '|96|', 7, '', 0, 0, 0, 1, 0, 0, 0, 0, '', '', 0, 0, 0, '{marka_db}', '{model_db}', '{engine_type_db}', '{engine_capacity_db}', {mileage_db}, '{transmission_db}', '{drive_type_db}', '{year_man_db}', '{points}')"
+                executeQuery(connect, insert_query, 'Row')
 
-                getLastId = f"SELECT * FROM `ns_goods` ORDER BY `itemId` DESC LIMIT 1"
-                lastId = (readQuery(connect, getLastId))[0][0]
+                get_last_id = f"SELECT * FROM `ns_goods` ORDER BY `itemId` DESC LIMIT 1"
+                last_id = (readQuery(connect, get_last_id))[0][0]
 
-                categoryQuery = f"INSERT INTO `ns_itemcatlink`(`categoryId`, `itemId`)" \
-                                f"VALUES (96, {lastId})"
-                executeQuery(connect, categoryQuery, 'Category')
+                category_query = f"INSERT INTO `ns_itemcatlink`(`categoryId`, `itemId`)" \
+                                f"VALUES (96, {last_id})"
+                executeQuery(connect, category_query, 'Category')
 
-                menuQuery = f"INSERT INTO `ns_sititem`(`name`, `param`, `itemId`, `bodyId`) " \
-                            f"VALUES ('overhead1', 'chaptersMenu', {lastId}, '')"
-                executeQuery(connect, menuQuery, 'Menu item')
+                menu_query = f"INSERT INTO `ns_sititem`(`name`, `param`, `itemId`, `bodyId`) " \
+                            f"VALUES ('overhead1', 'chaptersMenu', {last_id}, '')"
+                executeQuery(connect, menu_query, 'Menu item')
 
-                menuQuery = f"INSERT INTO `ns_sititem`(`name`, `param`, `itemId`, `bodyId`) " \
-                            f"VALUES ('megamenu', 'megaMenu', {lastId}, '')"
-                executeQuery(connect, menuQuery, 'Menu item')
+                menu_query = f"INSERT INTO `ns_sititem`(`name`, `param`, `itemId`, `bodyId`) " \
+                            f"VALUES ('megamenu', 'megaMenu', {last_id}, '')"
+                executeQuery(connect, menu_query, 'Menu item')
 
-                filterQuery = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
-                              f"VALUES (28, {lastId}, '{engineCapacityDB}', {engineCapacityDB})"
-                executeQuery(connect, filterQuery, 'Filter engineCapacity')
+                filter_query = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
+                              f"VALUES (28, {last_id}, '{engine_capacity_db}', {engine_capacity_db})"
+                executeQuery(connect, filter_query, 'Filter engineCapacity')
 
-                filterQuery = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
-                              f"VALUES (24, {lastId}, '{yearManDB}', {int(yearManDB)})"
-                executeQuery(connect, filterQuery, 'Filter yearMan')
+                filter_query = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
+                              f"VALUES (24, {last_id}, '{year_man_db}', {int(year_man_db)})"
+                executeQuery(connect, filter_query, 'Filter yearMan')
 
-                filterQuery = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
-                              f"VALUES (32, {lastId}, '{carClass}', 0)"
-                executeQuery(connect, filterQuery, 'Filter completation')
+                filter_query = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
+                              f"VALUES (32, {last_id}, '{car_class}', 0)"
+                executeQuery(connect, filter_query, 'Filter completation')
 
-                filterQuery = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
-                              f"VALUES (30, {lastId}, '{mileageDB}', {mileageDB})"
-                executeQuery(connect, filterQuery, 'Filter mileage')
+                filter_query = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
+                              f"VALUES (30, {last_id}, '{mileage_db}', {mileage_db})"
+                executeQuery(connect, filter_query, 'Filter mileage')
 
-                filterQuery = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
-                              f"VALUES (31, {lastId}, '{points}', 0)"
-                executeQuery(connect, filterQuery, 'Filter auction point')
+                filter_query = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
+                              f"VALUES (31, {last_id}, '{points}', 0)"
+                executeQuery(connect, filter_query, 'Filter auction point')
 
-                imagesFTP(images, URL, connect, lastId, flag=False)
-                imagesFTP(defectImage, URL, connect, lastId, flag=True)
+                images_ftp(images, url, connect, last_id, flag=False)
+                images_ftp(defect_image, url, connect, last_id, flag=True)
 
 
-def makeUrl(functions):
+def make_url(functions):
     links = []
     for function in functions:
         function = str.replace(function, 'fnPopupCarView(', '')
         function = str.replace(function, '); return false;', '')
-        functionArguments = function.split(',')
-        for argument in functionArguments:
-            index = functionArguments.index(argument)
+        function_arguments = function.split(',')
+        for argument in function_arguments:
+            index = function_arguments.index(argument)
             argument = str.replace(argument, '"', '')
-            functionArguments[index] = argument
+            function_arguments[index] = argument
         url = f"https://www.lotteautoauction.net/hp/auct/myp/entry/selectMypEntryCarDetPop.do?searchMngDivCd=" \
-              f"{functionArguments[0]}&searchMngNo={functionArguments[1]}&searchExhiRegiSeq={functionArguments[2]} "
+              f"{function_arguments[0]}&searchMngNo={function_arguments[1]}&searchExhiRegiSeq={function_arguments[2]} "
         links.append(url)
     return links
 
 
 # Download images and transfer via FTP and  MySQL
-def imagesFTP(links, filename, connect, lastId, flag):
+def images_ftp(links, filename, connect, last_id, flag):
     path = os.getcwd() + "\\temp\\"
     for link in links:
         if flag is True:
@@ -1649,16 +1649,16 @@ def imagesFTP(links, filename, connect, lastId, flag):
         file.write(r.content)
         file.close()
         try:
-            fileToSend = open(f'{path}\\{filename}({index}).jpg', "rb")
+            file_to_send = open(f'{path}\\{filename}({index}).jpg', "rb")
             with ftplib.FTP(host="185.98.5.170", user="youcar21", passwd="_tV2x9w9") as ftp:
                 ftp.cwd('/img/uploads/prebg/')
-                ftp.storbinary(f'STOR {filename}({index}).jpg', fileToSend)
+                ftp.storbinary(f'STOR {filename}({index}).jpg', file_to_send)
                 ftp.close()
-            fileToSend.close()
+            file_to_send.close()
 
-            addImage = f"INSERT INTO `ns_images`(`itemId`, `number`, `previewsm`, `previewmed`, `previewbg`)" \
-                       f"VALUES ({lastId}, {index}, 'img//uploads//prebg//{filename}({index}).jpg', 'img//uploads//prebg//{filename}({index}).jpg', 'img//uploads//prebg//{filename}({index}).jpg')"
-            executeQuery(connect, addImage, f'Image {index}')
+            add_image = f"INSERT INTO `ns_images`(`itemId`, `number`, `previewsm`, `previewmed`, `previewbg`)" \
+                       f"VALUES ({last_id}, {index}, 'img//uploads//prebg//{filename}({index}).jpg', 'img//uploads//prebg//{filename}({index}).jpg', 'img//uploads//prebg//{filename}({index}).jpg')"
+            executeQuery(connect, add_image, f'Image {index}')
         except Exception as e:
             print('Error:', e)
 
