@@ -101,7 +101,7 @@ def get_links(driver):
 
 
 def get_content(driver, links, translator):
-    connect = mysqlConnecting()
+    connect = mysql_сonnecting()
     for link in links:
         driver.get(link)
 
@@ -110,7 +110,7 @@ def get_content(driver, links, translator):
         vin = main_container.find_element_by_class_name("vehicle-detail"). \
             find_elements_by_class_name("tbl-v02")[0].find_element_by_xpath(".//tbody/tr[7]/td").text
         check_available = f"SELECT `url` FROM `ns_goods` WHERE `code`='{vin}'"
-        response = readQuery(connect, check_available)
+        response = read_query(connect, check_available)
         if len(response) != 0:
             print(f'Row already exist by URL {response[0][0]}')
         else:
@@ -1582,7 +1582,7 @@ def get_content(driver, links, translator):
                 executeQuery(connect, insert_query, 'Row')
 
                 get_last_id = f"SELECT * FROM `ns_goods` ORDER BY `itemId` DESC LIMIT 1"
-                last_id = (readQuery(connect, get_last_id))[0][0]
+                last_id = (read_query(connect, get_last_id))[0][0]
 
                 category_query = f"INSERT INTO `ns_itemcatlink`(`categoryId`, `itemId`)" \
                                 f"VALUES (96, {last_id})"
@@ -1663,8 +1663,7 @@ def images_ftp(links, filename, connect, last_id, flag):
             print('Error:', e)
 
 
-def mysqlConnecting():
-    connection = None
+def mysql_сonnecting():
     print('Connecting to database...')
     try:
         connection = mysql.connector.connect(
@@ -1674,19 +1673,19 @@ def mysqlConnecting():
             database='p-16561_youcarbase21'
         )
         print('MySQL Database connection successful')
-    except Error as err:
+        return connection
+    except Exception as err:
         print(f"Connection error: {err}")
-    return connection
 
 
 # Function for SELECT query to DB
-def readQuery(connection, query):
+def read_query(connection, query):
     cursor = connection.cursor()
     try:
         cursor.execute(query)
         result = cursor.fetchall()
         return result
-    except Error as err:
+    except Exception as err:
         print(f"Error: {err}")
 
 
