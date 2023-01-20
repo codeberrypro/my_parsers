@@ -1579,42 +1579,42 @@ def get_content(driver, links, translator):
                 insert_query = f"INSERT INTO `ns_goods`" \
                               f"(`topItem`, `tree`, `parent`, `visible`, `url`, `mainImage`, `popular`, `name`, `number`, `title`, `description`, `keywords`, `mainPrice`, `priceAllin`, `code`, `chars`, `brandId`, `price`, `units`, `info`, `textRight`, `text`, `changefreq`, `lastmod`, `priority`, `startPrice`, `valuteId`, `attributes`, `newItem`, `actPrice`, `startActPrice`, `attrPrice`, `actAttrPrice`, `mainAttrPrice`, `tree1`, `statusId`, `supplierCode`, `zakPrice`, `supplierId`, `upload`, `canBuy`, `quantity`, `percent`, `actionTime`, `actDate`, `actTime`, `tempid`, `colcom`, `rating`, `inOrder`, `marka`, `model`, `engineType`, `engineСapacity`, `mileage`, `transmission`, `driveType`, `yearMan`, `auctionMark`) " \
                               f"VALUES(1, '|96|', 96, 1, '{url}', 'img//uploads//prebg//{url}(1).jpg', 0, '{name_db}', 100, '', '', '', {price}, '{video_url}', '{vin}', '{chars}', 0, {price}, '', '', '', '{text_db}', 'always', '{time_now}', 0.9, {price}, 1, '', 1, 0, 0, {price}, 0, {price}, '|96|', 7, '', 0, 0, 0, 1, 0, 0, 0, 0, '', '', 0, 0, 0, '{marka_db}', '{model_db}', '{engine_type_db}', '{engine_capacity_db}', {mileage_db}, '{transmission_db}', '{drive_type_db}', '{year_man_db}', '{points}')"
-                executeQuery(connect, insert_query, 'Row')
+                execute_query(connect, insert_query, 'Row')
 
                 get_last_id = f"SELECT * FROM `ns_goods` ORDER BY `itemId` DESC LIMIT 1"
                 last_id = (read_query(connect, get_last_id))[0][0]
 
                 category_query = f"INSERT INTO `ns_itemcatlink`(`categoryId`, `itemId`)" \
                                 f"VALUES (96, {last_id})"
-                executeQuery(connect, category_query, 'Category')
+                execute_query(connect, category_query, 'Category')
 
                 menu_query = f"INSERT INTO `ns_sititem`(`name`, `param`, `itemId`, `bodyId`) " \
                             f"VALUES ('overhead1', 'chaptersMenu', {last_id}, '')"
-                executeQuery(connect, menu_query, 'Menu item')
+                execute_query(connect, menu_query, 'Menu item')
 
                 menu_query = f"INSERT INTO `ns_sititem`(`name`, `param`, `itemId`, `bodyId`) " \
                             f"VALUES ('megamenu', 'megaMenu', {last_id}, '')"
-                executeQuery(connect, menu_query, 'Menu item')
+                execute_query(connect, menu_query, 'Menu item')
 
                 filter_query = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
                               f"VALUES (28, {last_id}, '{engine_capacity_db}', {engine_capacity_db})"
-                executeQuery(connect, filter_query, 'Filter engineCapacity')
+                execute_query(connect, filter_query, 'Filter engineCapacity')
 
                 filter_query = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
                               f"VALUES (24, {last_id}, '{year_man_db}', {int(year_man_db)})"
-                executeQuery(connect, filter_query, 'Filter yearMan')
+                execute_query(connect, filter_query, 'Filter yearMan')
 
                 filter_query = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
                               f"VALUES (32, {last_id}, '{car_class}', 0)"
-                executeQuery(connect, filter_query, 'Filter completation')
+                execute_query(connect, filter_query, 'Filter completation')
 
                 filter_query = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
                               f"VALUES (30, {last_id}, '{mileage_db}', {mileage_db})"
-                executeQuery(connect, filter_query, 'Filter mileage')
+                execute_query(connect, filter_query, 'Filter mileage')
 
                 filter_query = f"INSERT INTO `ns_textparam`(`filterId`, `itemId`, `text`, `textInt`)" \
                               f"VALUES (31, {last_id}, '{points}', 0)"
-                executeQuery(connect, filter_query, 'Filter auction point')
+                execute_query(connect, filter_query, 'Filter auction point')
 
                 images_ftp(images, url, connect, last_id, flag=False)
                 images_ftp(defect_image, url, connect, last_id, flag=True)
@@ -1658,7 +1658,7 @@ def images_ftp(links, filename, connect, last_id, flag):
 
             add_image = f"INSERT INTO `ns_images`(`itemId`, `number`, `previewsm`, `previewmed`, `previewbg`)" \
                        f"VALUES ({last_id}, {index}, 'img//uploads//prebg//{filename}({index}).jpg', 'img//uploads//prebg//{filename}({index}).jpg', 'img//uploads//prebg//{filename}({index}).jpg')"
-            executeQuery(connect, add_image, f'Image {index}')
+            execute_query(connect, add_image, f'Image {index}')
         except Exception as e:
             print('Error:', e)
 
@@ -1690,18 +1690,18 @@ def read_query(connection, query):
 
 
 # Function for INSERT query to DB
-def executeQuery(connection, query, string):
+def execute_query(connection, query, string):
     cursor = connection.cursor()
     try:
         cursor.execute(query)
         connection.commit()
         print(f"\t{string} added")
-    except Error as err:
+    except Exception as err:
         print(f"Error: {err}")
 
 
 if __name__ == '__main__':
-    filtrBrand = input("Input car brand. Exaple:\n\t"
+    filter_brand = input("Input car brand. Exaple:\n\t"
                        "Hyundai - HD\n\t"
                        "Kia - KI\n\t"
                        "GM Korea - DW\n\t"
@@ -1730,8 +1730,8 @@ if __name__ == '__main__':
                        "Volkswagen - VK\n\t"
                        "Volvo - VO\n\t"
                        "Suzuki - SZ\n(Else press enter): ")
-    filtrYear = input("Input year: ")
-    filtrFuel = input("Input fuel type. Example:\n\t"
+    filter_year = input("Input year: ")
+    filter_fuel = input("Input fuel type. Example:\n\t"
                       "Gasoline - G\n\t"
                       "Desel - D\n\t"
                       "LPG - L\n\t"
@@ -1740,4 +1740,4 @@ if __name__ == '__main__':
                       "Diesel hybrid - T\n\t"
                       "Electricity - E\n\t"
                       "Gasoline/LPG - H\n(Else press enter): ")
-    parsing(filtrBrand, filtrYear, filtrFuel)
+    parsing(filter_brand, filter_year, filter_fuel)
