@@ -1,3 +1,16 @@
+"""
+Freelance project, unloads all products from a competitor's website.
+
+Parsing:
+    price
+    header
+    Pictures
+    rating
+    url
+    delivery
+
+"""
+
 import csv
 import time
 
@@ -43,11 +56,14 @@ def get_shop(ads):
         title = soup.find('section', attrs={'class': 'model-breadcrumbs bg-white'}).get_text(strip=True)
         description = soup.find('div', attrs={'class': 'description__body text-static'}).get_text(
             strip=True).replace('?', ' ')
+
+        # Get a price 10% less than on the website
         price_us = soup.find('div', attrs={'class': 'basket-button__usd'}).get_text(strip=True).split('$')[1]
         price_usd_percent = int(price_us) / 100 * 10
         price_usd = int(price_us) - int(price_usd_percent)
         price_usd = str(price_usd) + '$'
 
+        # Get a price 10% less than on the website
         price_ua = soup.find('div', attrs={'class': 'basket-button__uah'}).get_text(strip=True).split('грн')[0]
         price_ua_percent = int(price_ua) / 100 * 10
         price_ua = int(price_ua) - int(price_ua_percent)
