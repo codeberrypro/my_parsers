@@ -94,7 +94,7 @@ class WayfairParser:
             headers = {
                 "accept": "application/json",
                 "accept-language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
-                "apollographql-client-name": "@wayfair/sf-ui-product-details",
+                "apollographql-client-name": "@wayfair.com/sf-ui-product-details",
                 "apollographql-client-version": "bf018cf70462a1b6cd67c25ea15ad9c0bd8a3a15",
                 "content-type": "application/json",
                 "sec-ch-ua": "\" Not;A Brand\";v=\"99\", \"Google Chrome\";v=\"97\", \"Chromium\";v=\"97\"",
