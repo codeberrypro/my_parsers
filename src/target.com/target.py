@@ -9,7 +9,6 @@ from fake_useragent import UserAgent
 from functions import *
 
 ua = UserAgent()
-
 count_threads = 0
 MAX_THREADS = 10
 
@@ -49,7 +48,6 @@ def get_product(url, all_page_products_):
                   f"&state=KS" \
                   f"&zip=67346"
 
-        print(url)
         r = requests.get(new_ulr)
         count_threads -= 1
         if not r.ok:

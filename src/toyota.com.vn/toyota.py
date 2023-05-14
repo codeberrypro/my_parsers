@@ -3,11 +3,11 @@ import json
 import re
 import csv
 
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"}
 
-res = requests.get("https://www.toyota.com.vn/api/common/provinces", headers=headers)
-cookie = {"D1N": re.findall(r"[a-z, A-Z, 0-9]{30,40}", res.text)[0]}
+HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                         "Chrome/96.0.4664.110 Safari/537.36"}
+REQUEST = requests.get("https://www.toyota.com.vn/api/common/provinces", headers=HEADERS)
+COOKIES = {"D1N": re.findall(r"[a-z, A-Z, 0-9]{30,40}", REQUEST.text)[0]}
 
 
 def write_csv(data):
@@ -18,7 +18,7 @@ def write_csv(data):
 
 
 def get_ids():
-    ids_json = json.loads(requests.get("https://www.toyota.com.vn/api/common/provinces", headers=headers, cookies=cookie).text)
+    ids_json = json.loads(requests.get("https://www.toyota.com.vn/api/common/provinces", headers=HEADERS, cookies=COOKIES).text)
     ids_list = []
     for i in ids_json["Data_Ext"]["result"]["items"]:
         ids_list.append(i["id"])
@@ -28,8 +28,8 @@ def get_ids():
 def get_info():
     for i in get_ids():
         info_json = json.loads(requests.get("https://www.toyota.com.vn/api/common/dealerbyprovinceidanddistrictid",
-                                            params={"provinceId": i, "districtId": ""}, headers=headers,
-                                            cookies=cookie).text)
+                                            params={"provinceId": i, "districtId": ""}, headers=HEADERS,
+                                            cookies=COOKIES).text)
 
         for info in info_json["Data_Ext"]["result"]:
             try:

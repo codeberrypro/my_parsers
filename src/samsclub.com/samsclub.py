@@ -160,7 +160,7 @@ def start(driver):
     exit(0)
 
 
-def on_exit(_start_time: int, driver):
+def on_exit(_start_time):
     pass
 
 
