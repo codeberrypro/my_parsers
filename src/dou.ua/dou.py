@@ -26,6 +26,18 @@ class DouScraper:
         csrf_token = soup.find('input', {'name': 'csrfmiddlewaretoken'})['value']
         return csrf_token
 
+    def decode_email(self, link_decode):
+        """Decoding email using a request to the site"""
+        response = self.client.get(link_decode, headers=self.HEADERS)
+        soup = BeautifulSoup(response.text, features="html.parser")
+        try:
+            email_code = soup.find('span', attrs={'class': 'cf_email'})['data-cfemail']
+            r = int(email_code[:2], 16)
+            email = ''.join([chr(int(email_code[i:i + 2], 16) ^ r) for i in range(2, len(email_code), 2)])
+            return email
+        except (ValueError, TypeError):
+            return 'Email not found'
+
     def get_companies_list(self):
         csrf_token = self.get_csrf_token()
         pattern = 'https://jobs.dou.ua/companies/xhr-load/?'
@@ -33,14 +45,13 @@ class DouScraper:
 
         count = 1
         data_count = 0
-        companies = []
-
+        result = []
         while True:
             data_count += 20
             data = dict(csrfmiddlewaretoken=csrf_token, count=data_count)
             second_part = self.client.post(pattern, headers=self.HEADERS, data=data)
-            result = second_part.json()['html']
-            soup = BeautifulSoup(result, features="html.parser")
+            result_html = second_part.json()['html']
+            soup = BeautifulSoup(result_html, features="html.parser")
             items = soup.findAll('div', {'class': 'company'})
 
             if (second_part.json()['last']) or (len(items) >= 520):
@@ -49,8 +60,10 @@ class DouScraper:
             for item in items:
                 company = item.find('div', {'class': 'h2'}).find('a').text
                 link = item.find('div', {'class': 'h2'}).find('a').get('href')
-                companies.append((company, link))
-                print(f"{count}. {company} - {link}")
+                link_decode = link + 'offices/'
+                decoded_email = self.decode_email(link_decode)
+                result.append((company, link, decoded_email))
+                print(f"{count}. {company} {link} {decoded_email}")
                 count += 1
 
         return companies
