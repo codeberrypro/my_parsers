@@ -1,9 +1,10 @@
-from bs4 import BeautifulSoup
+import pandas as pd
 import requests
+from bs4 import BeautifulSoup
 
 
 class EbayScraper:
-    def init(self):
+    def __init__(self):
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome"
                           "/107.0.0.0 Safari/537.36",
@@ -13,6 +14,8 @@ class EbayScraper:
             '_pgn': 1,  # page number
             '_ipg': 200  # number of products per page
         }
+
+        self.data = []
 
     def extract_data(self):
         while True:
@@ -36,6 +39,11 @@ class EbayScraper:
                 except:
                     title = None
 
+                self.data.append({
+                    "title": title,
+                    "price": price,
+                    "link": link
+                })
                 print(title, link, price)
 
             if soup.select_one(".pagination__next"):
@@ -43,6 +51,11 @@ class EbayScraper:
             else:
                 break
 
+    def save_data(self):
+        df = pd.DataFrame(self.data)
+        df.to_csv('ebay_data.csv', index=False)
+
 
 scraper = EbayScraper()
 scraper.extract_data()
+scraper.save_data()
