@@ -17,6 +17,41 @@ categories_checked = 0
 all_categories = 0
 
 
+def get_file_name():
+    print("Select file with categories")
+    root = Tk()
+    root.wm_withdraw()
+    root.attributes("-topmost", True)
+    root.lift()
+    root.focus()
+    file_name = filedialog.askopenfilename()
+    root.destroy()
+    root.mainloop()
+    return file_name
+
+
+def tprint(*args, **kwargs):
+    print(f"[{datetime.strftime(datetime.now(), '%H:%M:%S')}]", *args, **kwargs)
+
+
+def thread(my_func):
+    def wrapper(*args, **kwargs):
+        my_thread = Thread(target=my_func, args=args, kwargs=kwargs)
+        my_thread.start()
+
+    return wrapper
+
+
+def trying(func, attempts=3):
+    for i in range(attempts):
+        try:
+            func_response = func()
+            if func_response == -1:
+                continue
+            else:
+                return func_response
+        except Exception as TryingError:
+            print('Function execution error', TryingError)
 
 
 class CategoryParser:
@@ -100,7 +135,17 @@ class CategoryParser:
             self.active_threads -= 1
             return -1
 
-
+    @thread
+    def checker_urls(self):
+        while self.getting_urls or self.all_urls:
+            if not self.all_urls:
+                time.sleep(.1)
+                continue
+            while self.active_threads >= MAX_THREADS:
+                time.sleep(.1)
+            current_url = self.all_urls.pop(0)
+            trying(lambda: self.check_product(current_url))
+            time.sleep(1)
 
 
 if __name__ == "__main__":
