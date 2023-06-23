@@ -34,7 +34,6 @@ def check_captcha(driver):
         sleep(0.2)
         action.release(element)
     except NoSuchElementException:
-        # print('captcha not found')
         return True
     except Exception as ex:
         print(f'error while solving captcha {ex}')

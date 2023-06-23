@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import threading
 
+
 class AgentScraper:
     def __init__(self, url):
         self.url = url
@@ -22,6 +23,7 @@ class AgentScraper:
                 print("Phone:", phone)
                 print("Email:", email)
                 print("Agency:", agency)
+
 
 if __name__ == '__main__':
     scraper = AgentScraper("https://www.coldwellbanker.com/city/nj/barnegat/agents")
