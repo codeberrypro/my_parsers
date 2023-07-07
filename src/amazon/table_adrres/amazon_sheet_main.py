@@ -16,10 +16,9 @@ from selenium import webdriver
 from selenium_stealth import stealth
 
 from store.waifair import store_authorization_wayfair
+from store.webstaurantstore import store_authorization_webstaurantstore, entry_data_webstaurantstore
 
-
-ua = UserAgent()
-
+User_Agent = UserAgent()
 COMPANY = ' WhiteLilyStore'  # name company
 PHONE_COMPANY = ''
 
@@ -74,9 +73,14 @@ def get_value_google_sheet(worksheet, driver):
 
         print(password, login, online_supplier, phone, zip_code, address_line, business_name, buyer_name, city, state)
 
+        if online_supplier == 'WebRestMerx':
+            store_authorization_webstaurantstore(driver, login, password)
+            entry_data_webstaurantstore(driver, business_name, buyer_name, address_line, zip_code, phone)
+
         if online_supplier == 'WayfairMerx':
             store_authorization_wayfair(driver, login, password)
             time.sleep(4)
+
 
 def main():
     driver_initialize = initialize_driver()
