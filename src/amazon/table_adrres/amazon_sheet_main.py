@@ -15,6 +15,8 @@ from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium_stealth import stealth
 
+from store.waifair import store_authorization_wayfair
+
 
 ua = UserAgent()
 
@@ -72,6 +74,9 @@ def get_value_google_sheet(worksheet, driver):
 
         print(password, login, online_supplier, phone, zip_code, address_line, business_name, buyer_name, city, state)
 
+        if online_supplier == 'WayfairMerx':
+            store_authorization_wayfair(driver, login, password)
+            time.sleep(4)
 
 def main():
     driver_initialize = initialize_driver()
