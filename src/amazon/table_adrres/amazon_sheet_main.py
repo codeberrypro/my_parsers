@@ -17,6 +17,7 @@ from selenium_stealth import stealth
 
 from store.waifair import store_authorization_wayfair
 from store.webstaurantstore import store_authorization_webstaurantstore, entry_data_webstaurantstore
+from store.katom import entry_data_katon
 
 User_Agent = UserAgent()
 COMPANY = ' WhiteLilyStore'  # name company
@@ -80,6 +81,9 @@ def get_value_google_sheet(worksheet, driver):
         if online_supplier == 'WayfairMerx':
             store_authorization_wayfair(driver, login, password)
             time.sleep(4)
+
+        if online_supplier == 'Katom':
+            entry_data_katon(driver, business_name, buyer_name, address_line, zip_code, phone)
 
 
 def main():
