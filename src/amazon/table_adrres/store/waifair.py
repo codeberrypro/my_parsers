@@ -15,7 +15,6 @@ def entry_data_wayfair(driver, *args):
     buyer_name = args[1]
     address_line = args[2]
     zip_code = args[3]
-    phone = args[4]
 
     driver.get('https://www.wayfair.com/session/secure/account/address_book?')
     time.sleep(3)

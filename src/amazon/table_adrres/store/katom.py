@@ -1,17 +1,15 @@
 import time
-from selenium.webdriver.common.keys import Keys
 
-COMPANY = ' WhiteLilyStore'  # если не указан в амазон для физ лиц
-PHONE_COMPANY = '18049640370'
+
+COMPANY = ' WhiteLilyStore'
+PHONE_COMPANY = ''
 
 
 def entry_data_katon(driver, *args):
-    business_name = args[0]
     buyer_name = args[1]
     last_name = args[7]
     address_line = args[2]
     zip_code = args[3]
-    phone = args[4]
     city = args[5]
     state = args[6]
 
@@ -31,8 +29,8 @@ def entry_data_katon(driver, *args):
     form_phone = driver.find_element_by_id('shipping_phone').send_keys(PHONE_COMPANY)
     time.sleep(1)
 
-    print(f'Введите штат {state}')
-    print(input('Введите штат...'))
+    print(f'Enter state {state}')
+    print(input('Enter state...'))
 
     time.sleep(2)
     flat_click = driver.find_element_by_id('shipping_primary').click()
