@@ -28,7 +28,7 @@ class ProductHuntScraper:
 
     def fetch_data(self, url):
         """
-        Получение данных по URL с использованием HTTP-запросов.
+        Getting data from a URL using HTTP requests.
         """
         try:
             response = requests.get(url, headers=self.headers)
@@ -40,7 +40,7 @@ class ProductHuntScraper:
 
     def parse_data(self, data):
         """
-        Парсинг JSON-данных из HTML-контента.
+        Parsing JSON data from HTML content.
         """
         try:
             soup = BeautifulSoup(data, 'html.parser')
@@ -55,7 +55,7 @@ class ProductHuntScraper:
 
     def get_user_data(self, data):
         """
-        Получеем urls пользователей из JSON-данных.
+        Getting user urls from JSON data.
         """
         user_data = []
         if data is None:
@@ -68,7 +68,7 @@ class ProductHuntScraper:
 
     def get_linkedin_urls(self, user_urls):
         """
-        Получение ссылок на профили LinkedIn.
+        Getting links to LinkedIn profiles.
         """
         linkedin_urls = []
         for url in user_urls:
@@ -88,7 +88,7 @@ class ProductHuntScraper:
 
     def save_to_database(self, date_published, url, linkedin_url):
         """
-        Сохранение пар URL и LinkedIn URL в базу данных SQLite.
+        Saving URL and LinkedIn URL pairs to a SQLite database.
         """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -102,29 +102,29 @@ class ProductHuntScraper:
                )
            ''')
 
-        # Проверяем что переменные url, linkedin_url не пустые
+        # Check that the variables url and linkedin_url are not empty
         if linkedin_url and cursor.execute('SELECT id FROM get_linkedin_urls WHERE url = ? AND linkedin_url = ?',
                                            (url, linkedin_url)).fetchone() is None:
-            # Добавить уникальное значение linkedin_url в базу данных.
+            # Add a unique linkedin_url value to the database.
             cursor.execute('INSERT INTO get_linkedin_urls (date_published, url, linkedin_url) VALUES (?, ?, ?)',
                            (date_published, url, linkedin_url))
 
             conn.commit()
             print(self.saved_records, date_published, url, linkedin_url)
 
-            # Код который сохраняет нужное количество данных
+            # Code that saves the required amount of data
             self.saved_records += 1
             if self.saved_records >= self.count_records + 1:
                 print(f'Saved {self.saved_records - 1}, Date {date_published}')
                 conn.close()
                 self.driver.quit()
-                self.driver.close()  # Закритие driver
+                self.driver.close()  # Close driver
                 raise StopIteration
 
     def selenium_thread(self, user_urls, date_published):
         self.driver = webdriver.Chrome(options=self.chrome_options)
         linkedin_urls = self.get_linkedin_urls(user_urls)
-        self.driver.quit()  # закрываем driver
+        self.driver.quit()  # Close driver
 
         for url, linkedin_url in zip(user_urls, linkedin_urls):
             self.save_to_database(date_published, url, linkedin_url)
@@ -172,12 +172,12 @@ class ProductHuntScraper:
             driver_thread.start()
             self.process_data(parsed_data, date_published)
         else:
-            print("Дата не найдена")
+            print("Date not found")
 
 
 if __name__ == "__main__":
-    count_records = 2  # количество пользователей
-    db_path = 'custom_db_path.db'  # путь к сохранению базы
+    count_records = 2  # count of users
+    db_path = 'custom_db_path.db'  # path to save the database
 
     scraper = ProductHuntScraper()
     base_url = 'https://www.producthunt.com/'
