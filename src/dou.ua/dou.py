@@ -27,7 +27,6 @@ class DouScraper:
         return csrf_token
 
     def decode_email(self, link_decode):
-        """Decoding email using a request to the site"""
         response = self.client.get(link_decode, headers=self.HEADERS)
         soup = BeautifulSoup(response.text, features="html.parser")
         try:

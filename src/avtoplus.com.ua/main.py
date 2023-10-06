@@ -1,5 +1,5 @@
 """
-Freelance project, unloads all products from a competitor's website.
+Freelance project, uploads all products from a competitor's website.
 
 Parsing:
     price
@@ -13,7 +13,6 @@ Parsing:
 
 import csv
 import time
-
 import requests
 from bs4 import BeautifulSoup
 
@@ -32,9 +31,9 @@ def get_url(url):
         if r.ok:  # status code 200
             return r
         else:
-            print('Ошибка доступа к сайту:', r.status_code)
+            print('Error accessing the site:', r.status_code)
     except requests.exceptions.ReadTimeout:
-        print("\n Переподключение к серверам \n")
+        print("\n Reconnecting to servers \n")
         time.sleep(3)
 
 
@@ -92,32 +91,25 @@ def get_shop(ads):
                 rating_dislike = '0'
 
             rating_percent = soup.find('span', attrs={'class': 'product-rating__percent'}).get_text(strip=True)
-            rating = f"Рейтинг продавця в Польщі Позитивних: - {rating_like} Негативних - {rating_dislike} {rating_percent}:                                    "
+            rating = f"Seller rating in Poland Positive: - {rating_like} Negative - {rating_dislike} {rating_percent}:"
         except:
-            rating = 'Немає рейтингу продавця'
+            rating = 'No seller rating'
 
         product = soup.find('section', attrs={'class': 'product'})
         img = product.find('div', attrs={'class': 'product__gallery js-init-gallery'})
         link_image = img.find_all('a', attrs={'class': 'product__small-picture js-small-pic'})
 
-        img_1 = link_image[0].get('href')
-        try:
-            img_2 = link_image[1].get('href')
-        except:
-            img_2 = None
+        # Initialize an empty list to store image hrefs
+        image_hrefs = []
 
-        try:
-            img_3 = link_image[2].get('href')
-        except:
-            img_3 = None
+        for i in range(4):  # find a maximum of 4 images
+            try:
+                img_href = link_image[i].get('href')
+            except IndexError:
+                img_href = None
+            image_hrefs.append(img_href)
 
-        try:
-            img_4 = link_image[3].get('href')
-        except:
-            img_4 = None
-
-        mg = f"{img_1}, {img_2}, {img_3}, {img_4}"
-
+        img_str = ', '.join(filter(None, image_hrefs))
         data = {
             'link': link,
             'title': title,
@@ -129,8 +121,9 @@ def get_shop(ads):
             'lot': lot,
             'quality': quality,
             'delivery': delivery,
-            'imgs': mg,
+            'imgs': img_str,
         }
+
         write_csv(data)
 
 
@@ -144,7 +137,7 @@ def main():
                 line = line.split('1/')[0]
                 url = f"{line}{page}"
 
-                print(f'[INFO] парсим страницу {page}')
+                print(f'[INFO] parse page {page}')
                 html = get_url(url)
                 soup = BeautifulSoup(html.text, 'html.parser')
                 ads = soup.find_all('div', attrs={'class': 'goods__item product-card product-card--categoryPage'})

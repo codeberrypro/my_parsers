@@ -5,7 +5,7 @@ PHONE_COMPANY = ''
 
 
 def store_authorization_wayfair(driver, login, password):
-    """Авторизация на webstaurantstore"""
+    """Authorization in the online store"""
     driver.get('https://www.wayfair.com/')
     input('Need to log in...')
 

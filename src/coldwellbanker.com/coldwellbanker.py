@@ -1,6 +1,6 @@
 import requests
-from bs4 import BeautifulSoup
 import threading
+from bs4 import BeautifulSoup
 
 
 class AgentScraper:

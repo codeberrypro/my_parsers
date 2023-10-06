@@ -76,7 +76,7 @@ class ProductHuntScraper:
             time.sleep(3)
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
             try:
-                linkedin_url = soup.find('a', href=re.compile(r"linkedin\.com"))
+                linkedin_url = soup.find('a', href=re.compile(r"producthunt.com\.com"))
                 if linkedin_url:
                     linkedin_urls.append(linkedin_url.get('href'))
                 else:

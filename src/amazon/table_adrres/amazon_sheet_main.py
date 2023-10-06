@@ -1,13 +1,17 @@
-'''
-https://docs.google.com/spreadsheets/d/1_TA5IWppAxSZOwmkmZaMeUum_G22Yko_iCyx9FtELT0/edit?usp=sharing
-https://docs.google.com/spreadsheets/d/19mNf0zyt0gDSlNhWgjsAS6sSRZIj7vSXZu5n7YExSHY/edit#gid=403295928
+"""
+This script is authorization on sites like
 
-WebRestMerx
-WayfairMerx
-KatomMerx
-TargetMerx
-HomedepotMerx
-'''
+WebRest
+Wayfair
+Katom
+Target
+Homedepot
+
+Reads data from Google sheets and, based on business logic,
+enters the necessary data into forms on the website, thereby
+filling out an application to purchase a product
+
+"""
 
 import time
 import gspread
@@ -51,9 +55,9 @@ def initialize_driver():
 
 def initialize_gspread_api():
     """Connected to google sheet api"""
-    gc = gspread.service_account(filename='sheet.json')  # название файла с сервисным аккаунтом
-    sh = gc.open_by_key('1UHUJt2guYcXtUF-FU7L7k7y1TKbxTRwZW8AYvCn5bTE')  # ID гугл таблицы
-    worksheet = sh.worksheet('testlist')  # Название листа для записи данных
+    gc = gspread.service_account(filename='sheet.json')  # name of the service account file
+    sh = gc.open_by_key('1UHUJt2guYcXtUF-FU7L7k7y1TKbxTRwZW8AYvCn5bTE')  # ID google sheets
+    worksheet = sh.worksheet('testlist')  # Name of the sheet for recording data
     return worksheet
 
 
