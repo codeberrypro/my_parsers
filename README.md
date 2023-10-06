@@ -13,7 +13,7 @@
 * selenium
 * UserAgent
 
-![This is a alt text.](https://github.com/codeberrypro/my_parsers/blob/master/logo.png)
+![This is a alt text.](https://github.com/codeberrypro/my_parsers/blob/master/logo.jpg)
 
 
 ## Sites
