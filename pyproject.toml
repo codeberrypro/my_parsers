@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "my-parsersv"
+version = "0.1.0"
+description = ""
+authors = ["Bohdan"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fake-useragent = "0.1.11"
+lxml = "4.9.2"
+requests = "2.28.1"
+selenium = "3.141.0"
+selenium-stealth = "1.0.6"
+selenium-wire = "5.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
